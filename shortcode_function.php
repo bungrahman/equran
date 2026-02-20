@@ -7,7 +7,6 @@
 
 
 
-
 function equran_wordpress_style($atts) {
     // Atribut shortcode
     $atts = shortcode_atts(
@@ -92,7 +91,8 @@ function equran_wordpress_style($atts) {
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--p-blue); }
         input:checked + .slider:before { transform: translateX(16px); }
-
+		.btn-audio-full { background: #fff; border: 1px solid var(--p-blue); color: var(--p-blue); padding: 5px 12px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .btn-audio-full:hover { background: var(--p-blue); color: #fff; }
         .btn-audio-full.playing { background: #d63638; border-color: #d63638; color: #fff; }
 
         /* TTS & Copy Buttons */
@@ -575,4 +575,3 @@ function equran_ayat_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('equran_ayat', 'equran_ayat_shortcode');
-
