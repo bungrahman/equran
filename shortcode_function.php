@@ -217,3 +217,96 @@ function equran_wordpress_style($atts) {
 }
 add_shortcode('tampilkan_quran', 'equran_wordpress_style');
 
+/**
+ * Shortcode untuk menampilkan 1 surat penuh
+ * [equran_surat nomor="1" color="red"]
+ */
+function equran_surat_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'nomor' => '1',
+        'color' => '#0073aa'
+    ), $atts, 'equran_surat');
+
+    $no = esc_attr($atts['nomor']);
+    $color = esc_attr($atts['color']);
+    
+    $url = "https://equran.id/api/v2/surat/{$no}";
+    $response = wp_remote_get($url);
+    if (is_wp_error($response)) return "Gagal memuat data.";
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    
+    if (!isset($data['data'])) return "Surat tidak ditemukan.";
+    $s = $data['data'];
+
+    ob_start();
+    ?>
+    <div class="equran-surat-wrap" style="--p-blue: <?php echo $color; ?>; font-family: sans-serif; max-width: 900px; margin: 20px auto; border: 1px solid #dcdcde; padding: 20px; border-radius: 8px; background: #fff;">
+        <div style="text-align:center; padding-bottom:20px; border-bottom: 2px solid var(--p-blue); margin-bottom:20px;">
+            <h2 style="color:var(--p-blue); margin:0;"><?php echo $s['namaLatin']; ?> (<?php echo $s['nama']; ?>)</h2>
+            <p style="margin:5px 0; color: #646970;"><?php echo $s['arti']; ?> &bull; <?php echo $s['jumlahAyat']; ?> Ayat</p>
+        </div>
+        <?php foreach ($s['ayat'] as $a): ?>
+            <div style="border-bottom: 1px solid #eee; padding: 25px 0;">
+                <div style="display:inline-block; width:28px; height:28px; border:1px solid var(--p-blue); color:var(--p-blue); border-radius:50%; text-align:center; line-height:28px; font-size:11px; font-weight:bold; margin-bottom:15px;">
+                    <?php echo $a['nomorAyat']; ?>
+                </div>
+                <div style="text-align:right; font-size:2rem; line-height:2.5; margin-bottom:15px; font-family: 'Amiri', serif;"><?php echo $a['teksArab']; ?></div>
+                <div style="color:var(--p-blue); font-style:italic; font-size:0.9rem; margin-bottom:5px;"><?php echo $a['teksLatin']; ?></div>
+                <div style="line-height:1.6; color:#3c434a;"><?php echo $a['teksIndonesia']; ?></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('equran_surat', 'equran_surat_shortcode');
+
+/**
+ * Shortcode untuk menampilkan 1 ayat saja
+ * [equran_ayat surat="1" ayat="1" color="red"]
+ */
+function equran_ayat_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'surat' => '1',
+        'ayat'  => '1',
+        'color' => '#0073aa'
+    ), $atts, 'equran_ayat');
+
+    $no_s = esc_attr($atts['surat']);
+    $no_a = esc_attr($atts['ayat']);
+    $color = esc_attr($atts['color']);
+    
+    $url = "https://equran.id/api/v2/surat/{$no_s}";
+    $response = wp_remote_get($url);
+    if (is_wp_error($response)) return "Gagal memuat data.";
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    
+    if (!isset($data['data'])) return "Surat tidak ditemukan.";
+    $s = $data['data'];
+    
+    $ayat_found = null;
+    foreach ($s['ayat'] as $a) {
+        if ($a['nomorAyat'] == $no_a) {
+            $ayat_found = $a;
+            break;
+        }
+    }
+    
+    if (!$ayat_found) return "Ayat tidak ditemukan.";
+
+    ob_start();
+    ?>
+    <div class="equran-ayat-single" style="--p-blue: <?php echo $color; ?>; font-family: sans-serif; border: 1px solid #dcdcde; border-left: 5px solid var(--p-blue); padding: 25px; border-radius: 4px; max-width: 900px; margin: 20px auto; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="font-size: 13px; color: var(--p-blue); font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">
+            <?php echo $s['namaLatin']; ?> : Ayat <?php echo $no_a; ?>
+        </div>
+        <div style="text-align:right; font-size:2.2rem; line-height:2.6; margin-bottom:20px; font-family: 'Amiri', serif;"><?php echo $ayat_found['teksArab']; ?></div>
+        <div style="color:var(--p-blue); font-style:italic; font-size:0.95rem; margin-bottom:10px;"><?php echo $ayat_found['teksLatin']; ?></div>
+        <div style="line-height:1.6; color:#3c434a; font-size:1.1rem;"><?php echo $ayat_found['teksIndonesia']; ?></div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('equran_ayat', 'equran_ayat_shortcode');
+
+
