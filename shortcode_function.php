@@ -127,7 +127,7 @@ function equran_wordpress_style($atts) {
             </div>
             <div class="s-grid">
                 <?php foreach ($surahs as $s) : ?>
-                <div class="s-card" onclick="getSurah(<?php echo $s['nomor']; ?>)" data-audio='<?php echo json_encode($s['audioFull']); ?>'>
+                <div class="s-card" onclick="getSurah(<?php echo $s['nomor']; ?>, this)" data-audio='<?php echo json_encode($s['audioFull']); ?>'>
                     <div class="s-idx"><?php echo $s['nomor']; ?></div>
                     <div class="s-main">
                         <strong><?php echo $s['namaLatin']; ?></strong>
@@ -153,7 +153,7 @@ function equran_wordpress_style($atts) {
         let player = null;
         let activeBtn = null;
 
-        async function getSurah(no) {
+        async function getSurah(no, card) {
             document.getElementById('q-list').style.display = 'none';
             document.getElementById('q-view').style.display = 'block';
             const container = document.getElementById('a-list');
@@ -169,7 +169,10 @@ function equran_wordpress_style($atts) {
                 const dT = await rT.json();
                 const s = dA.data;
                 tafsirStore = dT.data.tafsir;
+
                 const qKey = document.getElementById('q-qari').value;
+                const audioFullData = card ? JSON.parse(card.getAttribute('data-audio')) : s.audioFull;
+                const audioFullUrl = audioFullData ? audioFullData[qKey] : '';
 
                 document.getElementById('q-head').innerHTML = `
                     <div style="background:#fff; border:1px solid #dcdcde; padding:20px; margin-bottom:15px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
@@ -190,7 +193,7 @@ function equran_wordpress_style($atts) {
                         </div>
                         <div class="q-tool-item">
                             <span>Qari:</span>
-                            <select onchange="updateQariDetail(this.value, ${no})">
+                            <select class="sel-qari-detail" onchange="updateQariDetail(this.value, ${no})">
                                 ${document.getElementById('q-qari').innerHTML}
                             </select>
                         </div>
@@ -208,13 +211,15 @@ function equran_wordpress_style($atts) {
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <button class="btn-audio-full" id="btn-f-${no}" onclick="playFullSurah('${s.audioFull[qKey]}', this)">
+                        ${audioFullUrl ? `
+                        <button class="btn-audio-full" id="btn-f-${no}" onclick="playFullSurah('${audioFullUrl}', this)">
                             <span class="dashicons dashicons-controls-play"></span> Play Audio Full
-                        </button>
+                        </button>` : ''}
                     </div>
                 `;
                 // Set initial qari
-                document.querySelector('.q-toolbar select:nth-of-type(2)').value = qKey;
+                const selDetail = document.querySelector('.sel-qari-detail');
+                if(selDetail) selDetail.value = qKey;
 
                 let html = '';
                 s.ayat.forEach(a => {
