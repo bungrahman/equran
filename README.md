@@ -15,14 +15,14 @@ Demo: https://demo.jejakkreasi.com/equran/
 - CSS Predefined Styles: Desain responsif yang meniru gaya antarmuka WordPress.
 - Dashicons: Menggunakan library icon bawaan WordPress untuk antarmuka pengguna.
 
-## Fitur
-
-- Daftar Surat: Menampilkan seluruh surat dengan fitur pencarian real-time dan tombol putar audio surat lengkap.
-- Pilihan Qari: Pilih dari 6 qari internasional terbaik di daftar utama maupun langsung di dalam halaman baca surat.
-- Mode Baca: Tampilan per ayat dengan teks Arab yang indah dan sinkronisasi audio qari pilihan.
-- Audio Murattal: Mainkan audio per ayat atau satu surat penuh secara langsung.
-- Tafsir: Lihat tafsir lengkap untuk setiap ayat melalui modal pop-up.
-- Salin Ayat: Fitur satu klik untuk menyalin teks Arab.
+- **Al-Quran Digital**: Daftar surat lengkap dengan fitur pencarian real-time dan audio murattal.
+- **Alkitab Digital (AYT)**: Baca teks Alkitab Bahasa Indonesia (AYT) lengkap dengan navigasi kitab dan pasal.
+- **Fitur Pencarian**: Cari surat atau kitab dengan fitur filter instan.
+- **Tampilan Responsif**: Layout grid yang optimal untuk desktop dan mobile selebaran.
+- **Toolbar Premium**: Navigasi ayat/pasal, toggle transliterasi, dan terjemahan.
+- **Audio Full (Quran)**: Sekali klik untuk memutar murottal 1 surat penuh.
+- **Tafsir (Quran)**: Lihat tafsir lengkap setiap ayat dalam modal.
+- **Kustomisasi**: Atribut warna dan audio untuk menyesuaikan gaya situs Anda.
 
 ## Daftar Qari (Audio)
 
@@ -80,6 +80,13 @@ Gunakan ini jika hanya ingin menampilkan satu ayat spesifik.
 - audio: (Opsional) Kode qari (01-06).
 
 Contoh: [equran_ayat surat="2" ayat="255" color="red" audio="03"]
+
+### 4. Alkitab Digital Lengkap
+Shortcode ini menampilkan antarmuka utama untuk membaca Alkitab (AYT).
+```text
+[tampilkan_alkitab color="WARNA"]
+```
+- color: (Opsional) Warna tema. Contoh: [tampilkan_alkitab color="purple"]
 
 ## Kontribusi
 

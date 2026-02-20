@@ -5,6 +5,7 @@
  * Author: Bung Rahman
  */
 
+
 function equran_wordpress_style($atts) {
     // Atribut shortcode
     $atts = shortcode_atts(
@@ -38,7 +39,7 @@ function equran_wordpress_style($atts) {
         .q-search:focus { border-color: var(--p-blue); box-shadow: 0 0 0 1px var(--p-blue); outline: none; }
 
         /* List View */
-        .s-grid { display: grid; gap: 12px; }
+        .s-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .s-card { 
             display: flex; align-items: center; padding: 15px; background: #fff; 
             border: 1px solid #dcdcde; border-radius: 4px; cursor: pointer; transition: 0.1s;
