@@ -278,8 +278,16 @@ function equran_wordpress_style($atts) {
         }
 
         function scrollToA(n) {
-            if(n == 0) window.scrollTo(0,0);
-            else document.getElementById(`ayah-${n}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const items = document.querySelectorAll('.a-item');
+            if (n == 0) {
+                items.forEach(el => el.style.display = 'block');
+            } else {
+                items.forEach(el => {
+                    const id = parseInt(el.id.replace('ayah-', ''));
+                    el.style.display = id >= n ? 'block' : 'none';
+                });
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function toggleContent(cls, show) {
