@@ -93,16 +93,31 @@ function equran_wordpress_style($atts) {
         input:checked + .slider { background-color: var(--p-blue); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        .btn-audio-full { background: #fff; border: 1px solid var(--p-blue); color: var(--p-blue); padding: 5px 12px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; transition: 0.2s; }
-        .btn-audio-full:hover { background: var(--p-blue); color: #fff; }
         .btn-audio-full.playing { background: #d63638; border-color: #d63638; color: #fff; }
+
+        /* TTS & Copy Buttons */
+        .btn-tts, .btn-copy { background: #fff; border: 1px solid #dcdcde; color: #50575e; padding: 5px 10px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; transition: 0.2s; }
+        .btn-tts:hover { border-color: var(--p-blue); color: var(--p-blue); }
+        .btn-copy:hover { border-color: #2ecc71; color: #2ecc71; }
+        .btn-tts.speaking { background: var(--p-blue); border-color: var(--p-blue); color: #fff; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 
     <div class="q-app">
         <div id="m-tafsir" class="wp-modal">
             <div class="wp-modal-content">
                 <span class="dashicons dashicons-no-alt" style="position:absolute; right:15px; top:15px; cursor:pointer;" onclick="closeM()"></span>
-                <h3 id="m-title" style="color:var(--p-blue); margin-top:0;">Tafsir Ayat</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-right: 30px;">
+                    <h3 id="m-title" style="color:var(--p-blue); margin:0;">Tafsir Ayat</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-tts" id="btn-tts-m" onclick="speakM()">
+                            <span class="dashicons dashicons-megaphone"></span> Baca
+                        </button>
+                        <button class="btn-copy" onclick="copyM()">
+                            <span class="dashicons dashicons-admin-page"></span> Salin
+                        </button>
+                    </div>
+                </div>
                 <hr>
                 <div id="m-body" style="margin-top:15px; max-height:400px; overflow-y:auto; white-space:pre-line;"></div>
             </div>
@@ -233,6 +248,9 @@ function equran_wordpress_style($atts) {
                         <button class="btn-audio-full" id="btn-f-${no}" onclick="playFullSurah('${audioFullUrl}', this)">
                             <span class="dashicons dashicons-controls-play"></span> Play Audio Full
                         </button>` : ''}
+                        <button class="btn-tts" id="btn-tts-all" onclick="speakSurahTranslation()">
+                            <span class="dashicons dashicons-megaphone"></span> Baca Arti
+                        </button>
                     </div>
                 `;
                 // Set initial qari
@@ -252,7 +270,10 @@ function equran_wordpress_style($atts) {
                                 <button class="icon-btn" title="Baca Tafsir" onclick="openT(${a.nomorAyat})">
                                     <span class="dashicons dashicons-book-alt"></span>
                                 </button>
-                                <button class="icon-btn" title="Salin Ayat" onclick="navigator.clipboard.writeText('${a.teksArab}')">
+                                <button class="icon-btn btn-tts-a" title="Baca Terjemahan" onclick="speakText('${a.teksIndonesia.replace(/'/g, "\\'")}', this)">
+                                    <span class="dashicons dashicons-megaphone"></span>
+                                </button>
+                                <button class="icon-btn" title="Salin Ayat" onclick="copyA('${a.teksArab.replace(/'/g, "\\'")}', this)">
                                     <span class="dashicons dashicons-admin-page"></span>
                                 </button>
                             </div>
@@ -365,6 +386,75 @@ function equran_wordpress_style($atts) {
             });
         }
         window.onclick = function(e) { if(e.target.className === 'wp-modal') closeM(); }
+
+        // --- TTS & COPY Logic ---
+        let speech = window.speechSynthesis;
+        let speakBtn = null;
+
+        function speakText(text, btn) {
+            if (speech.speaking) {
+                speech.cancel();
+                if (speakBtn) {
+                    speakBtn.classList.remove('speaking');
+                    if (speakBtn.id === 'btn-tts-all') speakBtn.innerHTML = '<span class="dashicons dashicons-megaphone"></span> Baca Arti';
+                }
+                if (speakBtn === btn) { speakBtn = null; return; }
+            }
+
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'id-ID';
+            utter.rate = 1.1;
+            
+            utter.onstart = () => {
+                btn.classList.add('speaking');
+                speakBtn = btn;
+            };
+            
+            utter.onend = () => {
+                btn.classList.remove('speaking');
+                if (btn.id === 'btn-tts-all') btn.innerHTML = '<span class="dashicons dashicons-megaphone"></span> Baca Arti';
+                speakBtn = null;
+            };
+
+            speech.speak(utter);
+        }
+
+        function speakM() {
+            const txt = document.getElementById('m-body').innerText;
+            speakText(txt, document.getElementById('btn-tts-m'));
+        }
+
+        function copyM() {
+            const txt = document.getElementById('m-body').innerText;
+            navigator.clipboard.writeText(txt);
+            const btn = event.currentTarget;
+            const old = btn.innerHTML;
+            btn.innerHTML = '<span class="dashicons dashicons-yes"></span> Tersalin';
+            setTimeout(() => btn.innerHTML = old, 1500);
+        }
+
+        function copyA(txt, btn) {
+            navigator.clipboard.writeText(txt);
+            const old = btn.innerHTML;
+            btn.innerHTML = '<span class="dashicons dashicons-yes"></span>';
+            setTimeout(() => btn.innerHTML = old, 1500);
+        }
+
+        function speakSurahTranslation() {
+            const btn = document.getElementById('btn-tts-all');
+            if (speech.speaking && btn.classList.contains('speaking')) {
+                speech.cancel();
+                return;
+            }
+
+            const texts = Array.from(document.querySelectorAll('.a-item:not([style*="display: none"]) .id-txt'))
+                               .map(el => el.innerText);
+            
+            if (texts.length === 0) return;
+            
+            btn.innerHTML = '<span class="dashicons dashicons-controls-pause"></span> Berhenti';
+            speakText(texts.join('. '), btn);
+        }
     </script>
     <?php
     return ob_get_clean();
