@@ -76,6 +76,23 @@ function equran_wordpress_style($atts) {
         /* Modal Tafsir */
         .wp-modal { display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .wp-modal-content { background: #fff; margin: 5% auto; padding: 25px; width: 90%; max-width: 650px; border-radius: 4px; position: relative; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+
+        /* Premium Toolbar Styles */
+        .q-toolbar { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center; background: #fff; padding: 15px; border: 1px solid #dcdcde; border-radius: 4px; margin-bottom: 20px; }
+        .q-tool-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #1d2327; font-weight: 600; }
+        .q-tool-item select { padding: 5px 10px; border: 1px solid #8c8f94; border-radius: 4px; background: #fff; font-size: 13px; }
+        
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 18px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--p-blue); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        .btn-audio-full { background: #fff; border: 1px solid var(--p-blue); color: var(--p-blue); padding: 5px 12px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .btn-audio-full:hover { background: var(--p-blue); color: #fff; }
+        .btn-audio-full.playing { background: #d63638; border-color: #d63638; color: #fff; }
     </style>
 
     <div class="q-app">
@@ -155,23 +172,55 @@ function equran_wordpress_style($atts) {
                 const qKey = document.getElementById('q-qari').value;
 
                 document.getElementById('q-head').innerHTML = `
-                    <h2 style="margin:0 0 10px 0; color:var(--p-blue);">${s.namaLatin}</h2>
-                    <div style="margin-bottom:15px;">${s.arti} &bull; ${s.jumlahAyat} Ayat</div>
-                    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
-                        <span style="font-size:13px; color:#646970;">Ganti Qari:</span>
-                        <select onchange="updateQariDetail(this.value, ${no})" style="padding: 5px; border: 1px solid #8c8f94; border-radius: 4px; background: #fff;">
-                            ${document.getElementById('q-qari').innerHTML}
-                        </select>
+                    <div style="background:#fff; border:1px solid #dcdcde; padding:20px; margin-bottom:15px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="text-align:left;">
+                            <h2 style="margin:0; color:var(--p-blue);">${s.namaLatin} &bull; <small style="color:#646970">${s.arti}</small></h2>
+                            <div style="font-size:13px; color:#646970; margin-top:5px;">${s.tempatTurun} &bull; ${s.jumlahAyat} Ayat</div>
+                        </div>
+                        <div style="font-size:1.8rem; font-weight:bold; color:var(--p-blue);">${s.nama}</div>
+                    </div>
+                    
+                    <div class="q-toolbar">
+                        <div class="q-tool-item">
+                            <span>Ayat:</span>
+                            <select onchange="scrollToA(this.value)">
+                                <option value="0">Semua</option>
+                                ${s.ayat.map(a => `<option value="${a.nomorAyat}">${a.nomorAyat}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="q-tool-item">
+                            <span>Qari:</span>
+                            <select onchange="updateQariDetail(this.value, ${no})">
+                                ${document.getElementById('q-qari').innerHTML}
+                            </select>
+                        </div>
+                        <div class="q-tool-item">
+                            <span class="dashicons dashicons-translation"></span> <span>Latin</span>
+                            <label class="switch">
+                                <input type="checkbox" checked onchange="toggleContent('lt-txt', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="q-tool-item">
+                            <span class="dashicons dashicons-editor-textcolor"></span> <span>Arti</span>
+                            <label class="switch">
+                                <input type="checkbox" checked onchange="toggleContent('id-txt', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <button class="btn-audio-full" id="btn-f-${no}" onclick="playFullSurah('${s.audioFull[qKey]}', this)">
+                            <span class="dashicons dashicons-controls-play"></span> Play Audio Full
+                        </button>
                     </div>
                 `;
-                // Set the correct selected option in the detail view dropdown
-                document.querySelector('#q-head select').value = qKey;
+                // Set initial qari
+                document.querySelector('.q-toolbar select:nth-of-type(2)').value = qKey;
 
                 let html = '';
                 s.ayat.forEach(a => {
                     const audio = a.audio[qKey];
                     html += `
-                        <div class="a-item">
+                        <div class="a-item" id="ayah-${a.nomorAyat}">
                             <div class="a-toolbar">
                                 <div class="a-badge">${a.nomorAyat}</div>
                                 <button class="icon-btn" title="Mainkan Audio" onclick="playQ('${audio}', this)">
@@ -198,6 +247,33 @@ function equran_wordpress_style($atts) {
         function updateQariDetail(val, no) {
             document.getElementById('q-qari').value = val;
             getSurah(no); // Reload with new qari
+        }
+
+        function scrollToA(n) {
+            if(n == 0) window.scrollTo(0,0);
+            else document.getElementById(`ayah-${n}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function toggleContent(cls, show) {
+            document.querySelectorAll(`.${cls}`).forEach(el => el.style.display = show ? 'block' : 'none');
+        }
+
+        function playFullSurah(url, btn) {
+            if (player && player.src === url) {
+                player.pause();
+                player = null;
+                btn.classList.remove('playing');
+                btn.querySelector('.dashicons').className = 'dashicons dashicons-controls-play';
+                return;
+            }
+            playQ(url, btn);
+            btn.classList.add('playing');
+            btn.querySelector('.dashicons').className = 'dashicons dashicons-controls-pause';
+            player.onended = () => {
+                btn.classList.remove('playing');
+                btn.querySelector('.dashicons').className = 'dashicons dashicons-controls-play';
+                player = null;
+            };
         }
 
         function playSurahAudio(card, btn) {
