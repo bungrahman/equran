@@ -41,6 +41,8 @@ Gunakan shortcode berikut di halaman atau postingan WordPress Anda:
 ```text
 [tampilkan_quran]
 ```
+## Demo 
+https://demo.jejakkreasi.com/equran/
 
 ## Kontribusi
 
