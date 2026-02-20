@@ -6,6 +6,8 @@
  */
 
 
+
+
 function equran_wordpress_style($atts) {
     // Atribut shortcode
     $atts = shortcode_atts(
@@ -483,5 +485,4 @@ function equran_ayat_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('equran_ayat', 'equran_ayat_shortcode');
-
 
