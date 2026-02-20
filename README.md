@@ -17,10 +17,10 @@ Demo: https://demo.jejakkreasi.com/equran/
 
 ## Fitur
 
-- Daftar Surat: Menampilkan seluruh surat dengan fitur pencarian real-time.
-- Pilihan Qari: Pilih dari 6 qari internasional terbaik langsung di antarmuka.
-- Mode Baca: Tampilan per ayat dengan teks Arab yang indah.
-- Audio Murattal: Mainkan audio per ayat atau surat secara langsung.
+- Daftar Surat: Menampilkan seluruh surat dengan fitur pencarian real-time dan tombol putar audio surat lengkap.
+- Pilihan Qari: Pilih dari 6 qari internasional terbaik di daftar utama maupun langsung di dalam halaman baca surat.
+- Mode Baca: Tampilan per ayat dengan teks Arab yang indah dan sinkronisasi audio qari pilihan.
+- Audio Murattal: Mainkan audio per ayat atau satu surat penuh secara langsung.
 - Tafsir: Lihat tafsir lengkap untuk setiap ayat melalui modal pop-up.
 - Salin Ayat: Fitur satu klik untuk menyalin teks Arab.
 

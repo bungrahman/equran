@@ -110,7 +110,7 @@ function equran_wordpress_style($atts) {
             </div>
             <div class="s-grid">
                 <?php foreach ($surahs as $s) : ?>
-                <div class="s-card" onclick="getSurah(<?php echo $s['nomor']; ?>)">
+                <div class="s-card" onclick="getSurah(<?php echo $s['nomor']; ?>)" data-audio='<?php echo json_encode($s['audioFull']); ?>'>
                     <div class="s-idx"><?php echo $s['nomor']; ?></div>
                     <div class="s-main">
                         <strong><?php echo $s['namaLatin']; ?></strong>
@@ -118,7 +118,12 @@ function equran_wordpress_style($atts) {
                     </div>
                     <div class="s-ar-box">
                         <div class="s-name-ar"><?php echo $s['nama']; ?></div>
-                        <small style="color:#a7aaad"><?php echo $s['jumlahAyat']; ?> ayat</small>
+                        <div style="display:flex; align-items:center; justify-content:flex-end; gap:5px; margin-top:5px;">
+                            <small style="color:#a7aaad"><?php echo $s['jumlahAyat']; ?> ayat</small>
+                            <button class="icon-btn" style="color:var(--p-blue);" title="Play Full Surat" onclick="event.stopPropagation(); playSurahAudio(this.closest('.s-card'), this)">
+                                <span class="dashicons dashicons-controls-play"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -149,7 +154,18 @@ function equran_wordpress_style($atts) {
                 tafsirStore = dT.data.tafsir;
                 const qKey = document.getElementById('q-qari').value;
 
-                document.getElementById('q-head').innerHTML = `<h2 style="margin:0; color:var(--p-blue);">${s.namaLatin}</h2><div>${s.arti} &bull; ${s.jumlahAyat} Ayat</div>`;
+                document.getElementById('q-head').innerHTML = `
+                    <h2 style="margin:0 0 10px 0; color:var(--p-blue);">${s.namaLatin}</h2>
+                    <div style="margin-bottom:15px;">${s.arti} &bull; ${s.jumlahAyat} Ayat</div>
+                    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
+                        <span style="font-size:13px; color:#646970;">Ganti Qari:</span>
+                        <select onchange="updateQariDetail(this.value, ${no})" style="padding: 5px; border: 1px solid #8c8f94; border-radius: 4px; background: #fff;">
+                            ${document.getElementById('q-qari').innerHTML}
+                        </select>
+                    </div>
+                `;
+                // Set the correct selected option in the detail view dropdown
+                document.querySelector('#q-head select').value = qKey;
 
                 let html = '';
                 s.ayat.forEach(a => {
@@ -177,6 +193,18 @@ function equran_wordpress_style($atts) {
                 container.innerHTML = html;
                 window.scrollTo(0,0);
             } catch (e) { container.innerHTML = 'Gagal load data cok.'; }
+        }
+
+        function updateQariDetail(val, no) {
+            document.getElementById('q-qari').value = val;
+            getSurah(no); // Reload with new qari
+        }
+
+        function playSurahAudio(card, btn) {
+            const urls = JSON.parse(card.getAttribute('data-audio'));
+            const qKey = document.getElementById('q-qari').value;
+            const url = urls[qKey];
+            playQ(url, btn);
         }
 
         function playQ(url, btn) {
