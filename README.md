@@ -58,6 +58,9 @@ Shortcode ini menampilkan antarmuka utama dengan daftar surat dan pilihan qari.
 ```
 - color: (Opsional) Warna tema. Contoh: [tampilkan_quran color="blue"]
 
+- <img width="911" height="766" alt="image" src="https://github.com/user-attachments/assets/564c182a-1791-418a-bdb2-b7d2a643583e" />
+
+
 ### 2. Menampilkan 1 Surat Penuh
 Gunakan ini jika ingin menampilkan isi surat tertentu secara langsung beserta pemutar audio.
 ```text
