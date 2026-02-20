@@ -167,12 +167,20 @@ function equran_wordpress_style($atts) {
 
                 const dA = await rA.json();
                 const dT = await rT.json();
+                
+                if (!dA.data || !dA.data.ayat) throw new Error("Data surat tidak valid");
+                
                 const s = dA.data;
-                tafsirStore = dT.data.tafsir;
+                tafsirStore = (dT.data && dT.data.tafsir) ? dT.data.tafsir : [];
 
-                const qKey = document.getElementById('q-qari').value;
-                const audioFullData = card ? JSON.parse(card.getAttribute('data-audio')) : s.audioFull;
-                const audioFullUrl = audioFullData ? audioFullData[qKey] : '';
+                const qSelect = document.getElementById('q-qari');
+                const qKey = qSelect ? qSelect.value : '05';
+                
+                let audioFullUrl = '';
+                try {
+                    const audioFullData = card ? JSON.parse(card.getAttribute('data-audio')) : s.audioFull;
+                    audioFullUrl = (audioFullData && audioFullData[qKey]) ? audioFullData[qKey] : (s.audioFull ? s.audioFull[qKey] : '');
+                } catch(e) { console.warn("Audio data retrieval issue", e); }
 
                 document.getElementById('q-head').innerHTML = `
                     <div style="background:#fff; border:1px solid #dcdcde; padding:20px; margin-bottom:15px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
@@ -194,7 +202,14 @@ function equran_wordpress_style($atts) {
                         <div class="q-tool-item">
                             <span>Qari:</span>
                             <select class="sel-qari-detail" onchange="updateQariDetail(this.value, ${no})">
-                                ${document.getElementById('q-qari').innerHTML}
+                                ${qSelect ? qSelect.innerHTML : `
+                                    <option value="01">Abdullah Al-Juhany</option>
+                                    <option value="02">Ab. Muhsin Al-Qasim</option>
+                                    <option value="03">Ab.rahman As-Sudais</option>
+                                    <option value="04">Ibrahim Al-Dossari</option>
+                                    <option value="05" selected>Misyari Rasyid Al-Afasy</option>
+                                    <option value="06">Yasser Al-Dosari</option>
+                                `}
                             </select>
                         </div>
                         <div class="q-tool-item">
@@ -245,12 +260,20 @@ function equran_wordpress_style($atts) {
                     `;
                 });
                 container.innerHTML = html;
-                window.scrollTo(0,0);
-            } catch (e) { container.innerHTML = 'Gagal load data cok.'; }
+                window.scrollTo(0, 0);
+            } catch (e) { 
+                console.error("eQuran Error:", e);
+                container.innerHTML = `<div style="text-align:center; padding:40px;">
+                    <p style="color:#d63638; font-weight:bold;">Gagal load data cok.</p>
+                    <p style="font-size:12px; color:#646970;">Error: ${e.message}</p>
+                    <button class="btn-wp" onclick="getSurah(${no})">Coba Lagi</button>
+                </div>`; 
+            }
         }
 
         function updateQariDetail(val, no) {
-            document.getElementById('q-qari').value = val;
+            const qSelect = document.getElementById('q-qari');
+            if(qSelect) qSelect.value = val;
             getSurah(no); // Reload with new qari
         }
 
