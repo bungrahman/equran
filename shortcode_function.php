@@ -5,7 +5,18 @@
  * Author: Bung Rahman
  */
 
-function equran_wordpress_style() {
+function equran_wordpress_style($atts) {
+    // Atribut shortcode
+    $atts = shortcode_atts(
+        array(
+            'color' => '#0073aa', // Default WordPress Blue
+        ),
+        $atts,
+        'tampilkan_quran'
+    );
+
+    $primary_color = esc_attr($atts['color']);
+
     // Ambil daftar surat
     $url = "https://equran.id/api/v2/surat";
     $response = wp_remote_get($url);
@@ -19,7 +30,7 @@ function equran_wordpress_style() {
     ob_start();
     ?>
     <style>
-        :root { --p-blue: #0073aa; --bg-light: #f6f7f7; }
+        :root { --p-blue: <?php echo $primary_color; ?>; --bg-light: #f6f7f7; }
         .q-app { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; max-width: 900px; margin: auto; color: #1d2327; }
         
         /* Search Box */
@@ -205,3 +216,4 @@ function equran_wordpress_style() {
     return ob_get_clean();
 }
 add_shortcode('tampilkan_quran', 'equran_wordpress_style');
+

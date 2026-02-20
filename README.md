@@ -2,6 +2,8 @@
 
 eQuran adalah sebuah snippet fungsi PHP untuk menampilkan daftar surat Al-Quran lengkap dengan ayat, terjemahan Bahasa Indonesia, audio murattal, dan tafsir di situs WordPress Anda menggunakan satu shortcode.
 
+**Demo:** [https://demo.jejakkreasi.com/equran/](https://demo.jejakkreasi.com/equran/)
+
 ## Teknologi yang Digunakan
 
 - **PHP**: Logika backend untuk integrasi WordPress.
@@ -38,11 +40,25 @@ eQuran adalah sebuah snippet fungsi PHP untuk menampilkan daftar surat Al-Quran 
 
 Gunakan shortcode berikut di halaman atau postingan WordPress Anda:
 
+### Format Dasar
 ```text
 [tampilkan_quran]
 ```
 ## Demo 
 https://demo.jejakkreasi.com/equran/
+
+### Kustomisasi Warna
+Anda dapat mengubah warna tema menggunakan atribut `color`. Masukkan nama warna dasar atau kode warna Hex.
+
+**Contoh Warna Dasar:**
+- `[tampilkan_quran color="red"]`
+- `[tampilkan_quran color="green"]`
+- `[tampilkan_quran color="blue"]`
+- `[tampilkan_quran color="orange"]`
+
+**Contoh Kode Hex:**
+- `[tampilkan_quran color="#27ae60"]` (Hijau)
+- `[tampilkan_quran color="#e67e22"]` (Oranye)
 
 ## Kontribusi
 
