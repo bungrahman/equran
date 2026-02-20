@@ -72,7 +72,7 @@ function equran_wordpress_style($atts) {
         .dashicons { font-size: 20px; width: 20px; height: 20px; }
 
         .ar-txt { text-align: right; font-size: 2.3rem; line-height: 2.8; margin-bottom: 15px; font-family: "Amiri", serif; color: #2c3338; }
-        .lt-txt { color: var(--p-blue); font-style: italic; margin-bottom: 8px; font-size: 0.95rem; }
+        .lt-txt { color: var(--p-blue); font-style: italic; margin-bottom: 8px;}
         .id-txt { line-height: 1.6; color: #3c434a; }
         .a-item { border-bottom: 1px solid #dcdcde; padding: 30px 0; }
 
