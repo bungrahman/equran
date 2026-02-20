@@ -287,7 +287,7 @@ function equran_wordpress_style($atts) {
                     el.style.display = id >= n ? 'block' : 'none';
                 });
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('q-view').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function toggleContent(cls, show) {
