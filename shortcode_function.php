@@ -97,7 +97,17 @@ function equran_wordpress_style($atts) {
         </div>
 
         <div id="q-list">
-            <input type="text" class="q-search" id="q-find" placeholder="Cari surat..." onkeyup="searching()">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" class="q-search" id="q-find" placeholder="Cari surat..." onkeyup="searching()" style="margin-bottom: 0; flex-grow: 1;">
+                <select id="q-qari" style="padding: 10px; border: 1px solid #8c8f94; border-radius: 4px; background: #fff;">
+                    <option value="01">Abdullah Al-Juhany</option>
+                    <option value="02">Ab. Muhsin Al-Qasim</option>
+                    <option value="03">Ab.rahman As-Sudais</option>
+                    <option value="04">Ibrahim Al-Dossari</option>
+                    <option value="05" selected>Misyari Rasyid Al-Afasy</option>
+                    <option value="06">Yasser Al-Dosari</option>
+                </select>
+            </div>
             <div class="s-grid">
                 <?php foreach ($surahs as $s) : ?>
                 <div class="s-card" onclick="getSurah(<?php echo $s['nomor']; ?>)">
@@ -137,12 +147,13 @@ function equran_wordpress_style($atts) {
                 const dT = await rT.json();
                 const s = dA.data;
                 tafsirStore = dT.data.tafsir;
+                const qKey = document.getElementById('q-qari').value;
 
                 document.getElementById('q-head').innerHTML = `<h2 style="margin:0; color:var(--p-blue);">${s.namaLatin}</h2><div>${s.arti} &bull; ${s.jumlahAyat} Ayat</div>`;
 
                 let html = '';
                 s.ayat.forEach(a => {
-                    const audio = a.audio['05'];
+                    const audio = a.audio[qKey];
                     html += `
                         <div class="a-item">
                             <div class="a-toolbar">
@@ -224,11 +235,13 @@ add_shortcode('tampilkan_quran', 'equran_wordpress_style');
 function equran_surat_shortcode($atts) {
     $atts = shortcode_atts(array(
         'nomor' => '1',
-        'color' => '#0073aa'
+        'color' => '#0073aa',
+        'audio' => '05'
     ), $atts, 'equran_surat');
 
     $no = esc_attr($atts['nomor']);
     $color = esc_attr($atts['color']);
+    $audio_key = esc_attr($atts['audio']);
     
     $url = "https://equran.id/api/v2/surat/{$no}";
     $response = wp_remote_get($url);
@@ -244,11 +257,23 @@ function equran_surat_shortcode($atts) {
         <div style="text-align:center; padding-bottom:20px; border-bottom: 2px solid var(--p-blue); margin-bottom:20px;">
             <h2 style="color:var(--p-blue); margin:0;"><?php echo $s['namaLatin']; ?> (<?php echo $s['nama']; ?>)</h2>
             <p style="margin:5px 0; color: #646970;"><?php echo $s['arti']; ?> &bull; <?php echo $s['jumlahAyat']; ?> Ayat</p>
+            <?php if (isset($s['audioFull'][$audio_key])): ?>
+                <audio controls style="width: 100%; max-width: 300px; height: 30px; margin-top: 10px;">
+                    <source src="<?php echo $s['audioFull'][$audio_key]; ?>" type="audio/mpeg">
+                </audio>
+            <?php endif; ?>
         </div>
         <?php foreach ($s['ayat'] as $a): ?>
             <div style="border-bottom: 1px solid #eee; padding: 25px 0;">
-                <div style="display:inline-block; width:28px; height:28px; border:1px solid var(--p-blue); color:var(--p-blue); border-radius:50%; text-align:center; line-height:28px; font-size:11px; font-weight:bold; margin-bottom:15px;">
-                    <?php echo $a['nomorAyat']; ?>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                    <div style="display:inline-block; width:28px; height:28px; border:1px solid var(--p-blue); color:var(--p-blue); border-radius:50%; text-align:center; line-height:28px; font-size:11px; font-weight:bold;">
+                        <?php echo $a['nomorAyat']; ?>
+                    </div>
+                    <?php if (isset($a['audio'][$audio_key])): ?>
+                        <audio controls style="height: 28px; max-width: 200px;">
+                            <source src="<?php echo $a['audio'][$audio_key]; ?>" type="audio/mpeg">
+                        </audio>
+                    <?php endif; ?>
                 </div>
                 <div style="text-align:right; font-size:2rem; line-height:2.5; margin-bottom:15px; font-family: 'Amiri', serif;"><?php echo $a['teksArab']; ?></div>
                 <div style="color:var(--p-blue); font-style:italic; font-size:0.9rem; margin-bottom:5px;"><?php echo $a['teksLatin']; ?></div>
@@ -269,12 +294,14 @@ function equran_ayat_shortcode($atts) {
     $atts = shortcode_atts(array(
         'surat' => '1',
         'ayat'  => '1',
-        'color' => '#0073aa'
+        'color' => '#0073aa',
+        'audio' => '05'
     ), $atts, 'equran_ayat');
 
     $no_s = esc_attr($atts['surat']);
     $no_a = esc_attr($atts['ayat']);
     $color = esc_attr($atts['color']);
+    $audio_key = esc_attr($atts['audio']);
     
     $url = "https://equran.id/api/v2/surat/{$no_s}";
     $response = wp_remote_get($url);
@@ -297,8 +324,15 @@ function equran_ayat_shortcode($atts) {
     ob_start();
     ?>
     <div class="equran-ayat-single" style="--p-blue: <?php echo $color; ?>; font-family: sans-serif; border: 1px solid #dcdcde; border-left: 5px solid var(--p-blue); padding: 25px; border-radius: 4px; max-width: 900px; margin: 20px auto; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <div style="font-size: 13px; color: var(--p-blue); font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">
-            <?php echo $s['namaLatin']; ?> : Ayat <?php echo $no_a; ?>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div style="font-size: 13px; color: var(--p-blue); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                <?php echo $s['namaLatin']; ?> : Ayat <?php echo $no_a; ?>
+            </div>
+            <?php if (isset($ayat_found['audio'][$audio_key])): ?>
+                <audio controls style="height: 30px; max-width: 250px;">
+                    <source src="<?php echo $ayat_found['audio'][$audio_key]; ?>" type="audio/mpeg">
+                </audio>
+            <?php endif; ?>
         </div>
         <div style="text-align:right; font-size:2.2rem; line-height:2.6; margin-bottom:20px; font-family: 'Amiri', serif;"><?php echo $ayat_found['teksArab']; ?></div>
         <div style="color:var(--p-blue); font-style:italic; font-size:0.95rem; margin-bottom:10px;"><?php echo $ayat_found['teksLatin']; ?></div>
