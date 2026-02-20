@@ -1,3 +1,10 @@
+<?php
+/**
+ * Plugin Name: eQuran Shortcode
+ * Description: Menampilkan Al-Quran lengkap dengan audio dan tafsir melalui shortcode [tampilkan_quran].
+ * Author: Bung Rahman
+ */
+
 function equran_wordpress_style() {
     // Ambil daftar surat
     $url = "https://equran.id/api/v2/surat";

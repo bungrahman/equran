@@ -1,22 +1,25 @@
 # eQuran
 
-eQuran adalah sebuah snippet fungsi PHP sederhana untuk menampilkan ayat Al-Quran, terjemahan bahasa Indonesia, dan audio murattal dalam situs WordPress Anda menggunakan shortcode.
+eQuran adalah sebuah snippet fungsi PHP untuk menampilkan daftar surat Al-Quran lengkap dengan ayat, terjemahan Bahasa Indonesia, audio murattal, dan tafsir di situs WordPress Anda menggunakan satu shortcode.
 
 ## Teknologi yang Digunakan
 
-Proyek ini dibangun menggunakan teknologi berikut:
-
-- **PHP**: Bahasa pemrograman utama untuk logika fungsi.
-- **WordPress Shortcode API**: Untuk membuat shortcode `[equran]` yang dapat digunakan di post atau page.
-- **AlQuran Cloud API**: Layanan API eksternal untuk mengambil data ayat, terjemahan, dan audio.
-  - Endpoint: `http://api.alquran.cloud/v1/ayah/{surah}:{ayah}/editions/quran-uthmani,id.indonesian`
+- **PHP**: Logika backend untuk integrasi WordPress.
+- **WordPress Shortcode API**: Menyediakan shortcode `[tampilkan_quran]`.
+- **eQuran.id API (v2)**: Layanan API eksternal yang menyediakan data Al-Quran lengkap.
+  - Endpoint Utama: `https://equran.id/api/v2/surat`
+  - Endpoint Ayat & Tafsir: `https://equran.id/api/v2/surat/{nomor}` dan `https://equran.id/api/v2/tafsir/{nomor}`
+- **JavaScript (Async/Await)**: Untuk memuat data secara dinamis tanpa reload halaman.
+- **CSS Predefined Styles**: Desain responsif yang meniru gaya antarmuka WordPress.
+- **Dashicons**: Menggunakan library icon bawaan WordPress untuk antarmuka pengguna.
 
 ## Fitur
 
-- **Teks Arab**: Menggunakan font Scheherazade (jika tersedia) untuk keterbacaan yang baik.
-- **Terjemahan Indonesia**: Menggunakan edisi `id.indonesian`.
-- **Audio Murattal**: Pemutar audio HTML5 untuk mendengarkan bacaan ayat.
-- **Styling Dasar**: Output sudah memiliki styling minimal agar terlihat rapi.
+- **Daftar Surat**: Menampilkan seluruh surat dengan fitur pencarian real-time.
+- **Mode Baca**: Tampilan per ayat dengan teks Arab yang indah.
+- **Audio Murattal**: Mainkan audio per ayat secara langsung.
+- **Tafsir**: Lihat tafsir lengkap untuk setiap ayat melalui modal pop-up.
+- **Salin Ayat**: Fitur satu klik untuk menyalin teks Arab.
 
 ## Instalasi
 
@@ -26,55 +29,23 @@ Proyek ini dibangun menggunakan teknologi berikut:
    ```
 
 2. **Integrasi ke Tema**:
-   - Buka file `functions.php` di tema WordPress Anda.
-   - Tambahkan kode dari `shortcode_function.php` ke dalamnya, atau;
-   - Simpan `shortcode_function.php` di dalam folder tema, lalu panggil dengan:
-     ```php
-     require_once get_template_directory() . '/shortcode_function.php';
-     ```
+   Tambahkan kode dari `shortcode_function.php` ke file `functions.php` tema Anda, atau gunakan `require_once`:
+   ```php
+   require_once get_template_directory() . '/shortcode_function.php';
+   ```
 
 ## Penggunaan
 
-Gunakan shortcode berikut di dalam editor Post atau Page WordPress:
+Gunakan shortcode berikut di halaman atau postingan WordPress Anda:
 
-### Format Dasar
 ```text
-[equran surah="NOMOR_SURAT" ayah="NOMOR_AYAT"]
+[tampilkan_quran]
 ```
 
-### Contoh
-Menampilkan Surat Al-Fatihah Ayat 1:
-```text
-[equran surah="1" ayah="1"]
-```
+## Kontribusi
 
-Menampilkan Surat Al-Ikhlas Ayat 1:
-```text
-[equran surah="112" ayah="1"]
-```
-
-## Struktur Respons API
-
-Kode ini mengambil data JSON dari AlQuran Cloud API dengan struktur berikut (disederhanakan):
-
-```json
-{
-  "code": 200,
-  "status": "OK",
-  "data": [
-    {
-      "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
-      "audio": "http://cdn.alquran.cloud/media/audio/ayah/ar.alafasy/1",
-      "surah": { ... }
-    },
-    {
-      "text": "Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang.",
-      "edition": { "identifier": "id.indonesian" }
-    }
-  ]
-}
-```
+Bagi yang ingin berkontribusi dalam pengembangan UI atau fitur tambahan, silakan ajukan pull request.
 
 ## Lisensi
 
-Proyek ini bersifat open-source dan tersedia di bawah Lisensi MIT.
+Proyek ini bersifat open-source di bawah Lisensi MIT.
