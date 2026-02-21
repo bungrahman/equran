@@ -34,6 +34,11 @@ function equran_wordpress_style($atts) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
+		@font-face {
+			font-family: 'LPMQ';
+			src: url('https://raw.githubusercontent.com/bungrahman/equran/main/LPMQ.ttf');
+			font-display: swap;
+		}
         :root { --p-blue: <?php echo $primary_color; ?>; --bg-light: #f6f7f7; }
         .q-app { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; max-width: 900px; margin: auto; color: #1d2327; }
         
