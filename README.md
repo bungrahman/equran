@@ -1,32 +1,58 @@
 # eQuran
 
-eQuran adalah sebuah snippet fungsi PHP untuk menampilkan daftar surat Al-Quran lengkap dengan ayat, terjemahan Bahasa Indonesia, audio murattal dari 6 qari terbaik, dan tafsir di situs WordPress Anda menggunakan beberapa pilihan shortcode.
+eQuran adalah snippet fungsi PHP untuk menampilkan daftar surat Al-Quran lengkap dengan ayat, terjemahan Bahasa Indonesia, fitur tajwid berwarna, audio murattal dari 6 qari terbaik, dan tafsir di situs WordPress menggunakan shortcode.
 
-Demo: https://demo.jejakkreasi.com/equran/
+Demo: [https://demo.jejakkreasi.com/equran/](https://demo.jejakkreasi.com/equran/)
 
 ## Teknologi yang Digunakan
 
-- PHP: Logika backend untuk integrasi WordPress.
-- WordPress Shortcode API: Menyediakan shortcode [tampilkan_quran], [equran_surat], dan [equran_ayat].
-- eQuran.id API (v2): Layanan API eksternal yang menyediakan data Al-Quran lengkap dan audio berkualitas tinggi.
-  - Endpoint Utama: https://equran.id/api/v2/surat
-  - Endpoint Ayat & Tafsir: https://equran.id/api/v2/surat/{nomor} dan https://equran.id/api/v2/tafsir/{nomor}
-- JavaScript (Async/Await): Untuk memuat data secara dinamis tanpa reload halaman.
-- CSS Predefined Styles: Desain responsif yang meniru gaya antarmuka WordPress.
-- Dashicons: Menggunakan library icon bawaan WordPress untuk antarmuka pengguna.
+- **PHP**: Logika backend untuk integrasi WordPress.
+- **WordPress Shortcode API**: Menyediakan shortcode `[tampilkan_quran]`, `[equran_surat]`, dan `[equran_ayat]`.
+- **Integrasi API**:
+  - **eQuran.id API (v2)**: Memberikan data Al-Quran, terjemahan, dan audio.
+  - **AlQuran.cloud Tajweed API**: Menyediakan metadata tajwid untuk sinkronisasi teks berwarna.
+- **JavaScript (Async/Await)**: Memuat data secara dinamis tanpa reload halaman.
+- **CSS Vanilla**: Desain responsif dengan integrasi font **Amiri** dari Google Fonts untuk tampilan Mushaf yang optimal.
+- **Dashicons**: Menggunakan library icon bawaan WordPress.
 
-## Fitur
+## Fitur Utama
 
-- Daftar Surat: Menampilkan seluruh surat dengan fitur pencarian real-time dan tombol putar audio surat lengkap.
-- Pilihan Qari: Pilih dari 6 qari internasional terbaik di daftar utama maupun langsung di dalam halaman baca surat.
-- Mode Baca: Tampilan per ayat dengan teks Arab yang indah dan sinkronisasi audio qari pilihan.
-- Audio Murattal: Mainkan audio per ayat atau satu surat penuh secara langsung.
-- Tafsir: Lihat tafsir lengkap untuk setiap ayat melalui modal pop-up.
-- Salin Ayat: Fitur satu klik untuk menyalin teks Arab.
+- **Tajwid Berwarna (17 Aturan)**: Mendukung pewarnaan teks Arab berdasarkan aturan tajwid resmi dengan sistem legend dinamis per ayat.
+- **Tooltip Keterangan**: Legend tajwid dilengkapi dengan tooltip penjelasan aturan dalam Bahasa Indonesia.
+- **Daftar Surat**: Menampilkan seluruh surat dengan fitur pencarian real-time dan pemutar audio surat lengkap.
+- **Pilihan Qari**: Mendukung 6 qari internasional terbaik yang dapat dipilih secara global atau per surat.
+- **Mode Baca Responsif**: Tampilan per ayat dengan font Arab berkualitas tinggi (Amiri) dan sinkronisasi audio.
+- **Audio Murattal**: Mainkan audio per ayat atau satu surat penuh (audio full).
+- **Tafsir Digital**: Akses tafsir lengkap untuk setiap ayat melalui modal pop-up yang informatif.
+- **Salin & Berbagi**: Fitur untuk menyalin teks Arab langsung ke clipboard.
+
+## Daftar Aturan Tajwid yang Didukung
+
+Aplikasi ini mendukung sinkronisasi visual untuk 17 aturan tajwid berikut:
+
+| Kode | Nama Tajwid | Deskripsi |
+| :--- | :--- | :--- |
+| `h` | Hamzatul Wasl | Penanda Washal Hamzah. |
+| `s` | Saktah | Huruf yang tidak dibaca atau berhenti sejenak. |
+| `l` | Lam Shamsiyyah | Aturan Al-Syamsiyah. |
+| `n` | Mad Asli / Thabi'i | Pemanjangan normal: 2 Harakat. |
+| `p` | Mad Jaiz Munfasil | Pemanjangan boleh: 2, 4, 6 Harakat. |
+| `m` | Mad Lazim | Pemanjangan wajib: 6 Harakat. |
+| `q` | Qalqalah | Bunyi pantulan pada huruf tertentu. |
+| `o` | Mad Wajib Muttasil | Pemanjangan wajib: 4-5 Harakat. |
+| `c` | Ikhfa Shafawi | Menyamarkan Mim Sakinah bertemu Ba. |
+| `f` | Ikhfa | Menyamarkan Nun Sakinah atau Tanwin. |
+| `w` | Idgham Shafawi | Meleburkan Mim Sakinah bertemu Mim. |
+| `i` | Iqlab | Mengubah Nun Sakinah atau Tanwin menjadi Mim. |
+| `a` | Idgham Bighunnah | Peleburan disertai suara dengung. |
+| `u` | Idgham Bila Ghunnah | Peleburan tanpa suara dengung. |
+| `d` | Idgham Mutajanisayn | Peleburan dua huruf yang sejenis. |
+| `b` | Idgham Mutaqaribayn | Peleburan dua huruf makhraj berdekatan. |
+| `g` | Ghunnah | Suara dengung selama 2 harakat. |
 
 ## Daftar Qari (Audio)
 
-Berikut adalah daftar qari yang tersedia beserta kodenya:
+Tersedia audio murattal dari qari berikut:
 - 01: Abdullah Al-Juhany
 - 02: Abdul Muhsin Al-Qasim
 - 03: Abdurrahman As-Sudais
@@ -36,59 +62,43 @@ Berikut adalah daftar qari yang tersedia beserta kodenya:
 
 ## Instalasi
 
-1. Download atau Clone:
-   ```bash
-   git clone https://github.com/bungrahman/equran.git
-   ```
+### 1. Download atau Clone
+```bash
+git clone https://github.com/bungrahman/equran.git
+```
 
-2. Integrasi ke Tema:
-   Tambahkan kode dari shortcode_function.php ke file functions.php tema Anda, atau gunakan require_once:
-   ```php
-   require_once get_template_directory() . '/shortcode_function.php';
-   ```
+### 2. Integrasi ke Tema WordPress
+Tambahkan kode dari `shortcode-function.php` ke file `functions.php` tema Anda, atau gunakan `require_once`:
+```php
+require_once get_template_directory() . '/shortcode-function.php';
+```
 
-## Penggunaan
-
-Gunakan shortcode berikut di halaman atau postingan WordPress Anda.
+## Penggunaan Shortcode
 
 ### 1. Daftar Al-Quran Lengkap
-Shortcode ini menampilkan antarmuka utama dengan daftar surat dan pilihan qari.
+Menampilkan antarmuka utama dengan daftar surat, pencarian, dan pilihan qari.
 ```text
-[tampilkan_quran color="WARNA"]
+[tampilkan_quran color="#hexcolor"]
 ```
-- color: (Opsional) Warna tema. Contoh: [tampilkan_quran color="blue"]
 
-<img width="911" height="766" alt="image" src="https://github.com/user-attachments/assets/564c182a-1791-418a-bdb2-b7d2a643583e" />
-<img width="384" height="837" alt="image" src="https://github.com/user-attachments/assets/f4f236cf-f431-4db6-952e-1d54e39e4c95" />
+<img width="911" height="766" alt="Desktop View" src="https://github.com/user-attachments/assets/564c182a-1791-418a-bdb2-b7d2a643583e" />
+<img width="384" height="837" alt="Mobile View" src="https://github.com/user-attachments/assets/f4f236cf-f431-4db6-952e-1d54e39e4c95" />
 
-
-
-### 2. Menampilkan 1 Surat Penuh
-Gunakan ini jika ingin menampilkan isi surat tertentu secara langsung beserta pemutar audio.
+### 2. Menampilkan Satu Surat Penuh
 ```text
-[equran_surat nomor="X" color="WARNA" audio="KODE_QARI"]
+[equran_surat nomor="X" color="#hexcolor" audio="KODE_QARI"]
 ```
-- nomor: Nomor surat (1-114).
-- color: (Opsional) Warna tema.
-- audio: (Opsional) Kode qari (01-06).
+- **nomor**: Nomor surat (1-114).
+- **audio**: Kode qari (01-06).
 
-Contoh: [equran_surat nomor="18" color="teal" audio="01"]
-
-### 3. Menampilkan 1 Ayat Saja
-Gunakan ini jika hanya ingin menampilkan satu ayat spesifik.
+### 3. Menampilkan Satu Ayat Spesifik
 ```text
-[equran_ayat surat="X" ayat="Y" color="WARNA" audio="KODE_QARI"]
+[equran_ayat surat="X" ayat="Y" color="#hexcolor" audio="KODE_QARI"]
 ```
-- surat: Nomor surat.
-- ayat: Nomor ayat.
-- color: (Opsional) Warna tema.
-- audio: (Opsional) Kode qari (01-06).
-
-Contoh: [equran_ayat surat="2" ayat="255" color="red" audio="03"]
 
 ## Kontribusi
 
-Bagi yang ingin berkontribusi dalam pengembangan UI atau fitur tambahan, silakan ajukan pull request.
+Bagi yang ingin berkontribusi dalam pengembangan UI, optimasi parsing tajwid, atau fitur tambahan, silakan ajukan pull request.
 
 ## Lisensi
 
