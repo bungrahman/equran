@@ -1,105 +1,78 @@
-# eQuran
+# eQuran - Technical Documentation
 
-eQuran adalah snippet fungsi PHP untuk menampilkan daftar surat Al-Quran lengkap dengan ayat, terjemahan Bahasa Indonesia, fitur tajwid berwarna, audio murattal dari 6 qari terbaik, dan tafsir di situs WordPress menggunakan shortcode.
+eQuran adalah solusi snippet PHP untuk WordPress yang memungkinkan integrasi daftar surat Al-Quran lengkap dengan fitur premium seperti tajwid berwarna, audio murattal multi-qari, dan tafsir digital. Dokumen ini merinci arsitektur teknis, API yang digunakan, dan metodologi pengembangan yang diimplementasikan.
 
 Demo: [https://demo.jejakkreasi.com/equran/](https://demo.jejakkreasi.com/equran/)
 
-## Teknologi yang Digunakan
+## Arsitektur Sistem
 
-- **PHP**: Logika backend untuk integrasi WordPress.
-- **WordPress Shortcode API**: Menyediakan shortcode `[tampilkan_quran]`, `[equran_surat]`, dan `[equran_ayat]`.
-- **Integrasi API**:
-  - **eQuran.id API (v2)**: Memberikan data Al-Quran, terjemahan, dan audio.
-  - **AlQuran.cloud Tajweed API**: Menyediakan metadata tajwid untuk sinkronisasi teks berwarna.
-- **JavaScript (Async/Await)**: Memuat data secara dinamis tanpa reload halaman.
-- **CSS Vanilla**: Desain responsif dengan integrasi font **Amiri** dari Google Fonts untuk tampilan Mushaf yang optimal.
-- **Dashicons**: Menggunakan library icon bawaan WordPress.
+Aplikasi ini menggunakan pendekatan hybrid yang menggabungkan rendering sisi server (Server-Side Rendering) untuk struktur utama dan interaksi sisi klien (Client-Side Interaction) untuk performa yang responsif.
 
-## Fitur Utama
+### 1. Backend (PHP & WordPress Integration)
+Metode utama yang digunakan adalah WordPress Shortcode API. Seluruh logika terkonsentrasi pada file `shortcode-function.php`.
+- **Data Fetching**: Menggunakan `wp_remote_get` untuk pengambilan data dari API eksternal secara aman dan efisien di sisi server.
+- **Output Buffering**: Menggunakan `ob_start()` dan `ob_get_clean()` untuk menangkap output HTML dan mengembalikannya secara bersih melalui shortcode.
+- **Data Pre-processing**: Melakukan pengolahan data JSON serta konversi angka Barat ke numeral Arab (١, ٢, ٣) menggunakan fungsi `equran_to_arabic_number`.
 
-- **Tajwid Berwarna (17 Aturan)**: Mendukung pewarnaan teks Arab berdasarkan aturan tajwid resmi dengan sistem legend dinamis per ayat.
-- **Tooltip Keterangan**: Legend tajwid dilengkapi dengan tooltip penjelasan aturan dalam Bahasa Indonesia.
-- **Daftar Surat**: Menampilkan seluruh surat dengan fitur pencarian real-time dan pemutar audio surat lengkap.
-- **Pilihan Qari**: Mendukung 6 qari internasional terbaik yang dapat dipilih secara global atau per surat.
-- **Mode Baca Responsif**: Tampilan per ayat dengan font Arab berkualitas tinggi (Amiri) dan sinkronisasi audio.
-- **Audio Murattal**: Mainkan audio per ayat atau satu surat penuh (audio full).
-- **Tafsir Digital**: Akses tafsir lengkap untuk setiap ayat melalui modal pop-up yang informatif.
-- **Salin & Berbagi**: Fitur untuk menyalin teks Arab langsung ke clipboard.
+### 2. Frontend (JavaScript & UI)
+Interaksi dinamis dikelola sepenuhnya menggunakan Vanilla JavaScript (ES6+).
+- **Asynchronous Operations**: Penggunaan `async/await` untuk pengambilan data surat, tajwid, dan tafsir secara paralel guna meminimalisir waktu tunggu.
+- **Dynamic DOM Manipulation**: Memperbarui antarmuka pengguna secara real-time berdasarkan aksi pengguna (seperti pencarian surat atau pemilihan qari) tanpa memuat ulang halaman.
+- **State Management**: Penyimpanan data tafsir secara lokal (`tafsirStore`) untuk akses cepat saat modal dibuka.
 
-## Daftar Aturan Tajwid yang Didukung
+### 3. Arsitektur Styling
+- **CSS Variables**: Menggunakan variabel CSS untuk manajemen warna primer (`--p-blue`) yang memungkinkan kustomisasi tema melalui parameter shortcode.
+- **Typography Integration**: Integrasi Google Fonts (Amiri) sebagai standar tipografi Arab berkualitas tinggi dengan metode loading asinkron dan `font-display: swap` untuk optimasi User Experience.
+- **Responsive Layout**: Implementasi CSS Grid dan Flexbox untuk memastikan tampilan presisi pada perangkat desktop maupun seluler.
 
-Aplikasi ini mendukung sinkronisasi visual untuk 17 aturan tajwid berikut:
+## Rincian API yang Digunakan
 
-| Kode | Nama Tajwid | Deskripsi |
+Aplikasi ini mengintegrasikan dua penyedia API utama untuk menyajikan data Al-Quran yang komprehensif:
+
+### 1. eQuran.id API (v2)
+Berperan sebagai penyedia data utama Al-Quran.
+- **Endpoint List Surat**: `https://equran.id/api/v2/surat`
+- **Endpoint Detail Surat**: `https://equran.id/api/v2/surat/{nomor}`
+- **Endpoint Tafsir**: `https://equran.id/api/v2/tafsir/{nomor}`
+- **Data yang Diambil**: Teks Arab standar, teks Latin, terjemahan Bahasa Indonesia, audio murattal per ayat, dan audio full surat dari 6 qari internasional.
+
+### 2. AlQuran.cloud Tajweed API
+Digunakan khusus untuk sinkronisasi metadata tajwid.
+- **Endpoint Surah**: `https://api.alquran.cloud/v1/surah/{nomor}/quran-tajweed`
+- **Endpoint Ayah**: `https://api.alquran.cloud/v1/ayah/{surah}:{ayah}/quran-tajweed`
+- **Metodologi**: API ini memberikan teks Arab yang disisipi marker tajwid (seperti `[f:3917]`). Teks ini kemudian diproses menggunakan Regular Expression di sisi klien untuk diubah menjadi elemen HTML `<span>` dengan kelas warna yang sesuai.
+
+## Metodologi Implementasi Fitur
+
+### 1. Parsing Tajwid Berwarna
+Sistem menggunakan dua tahap parsing Regular Expression untuk menangani berbagai gaya penulisan tajwid:
+- **Pass 1**: Menangani marker dengan format kurung ganda atau spesifikasi angka (`[f:123]`).
+- **Pass 2**: Menangani marker dasar yang langsung menempel pada huruf untuk memastikan tidak ada aturan yang terlewat.
+- **Dynamic Legend**: Sistem secara otomatis mengekstrak aturan unik yang ditemukan dalam satu ayat dan menampilkannya sebagai legenda di bawah teks Arab.
+
+### 2. Penomoran Ayat Arab
+Setiap akhir ayat dilengkapi dengan ornamen lingkaran yang berisi nomor ayat dalam numeral Arab.
+- **Konversi Numerik**: Menggunakan pemetaan array sederhana dari angka 0-9 ke karakter Unicode Arab (٠-٩).
+- **Styling**: Menggunakan CSS Border-Radius dan Flexbox untuk memastikan nomor ayat berada tepat di posisi tengah ornamen secara vertikal dan horizontal.
+
+## Daftar Shortcode
+
+| Shortcode | Deskripsi | Parameter Utama |
 | :--- | :--- | :--- |
-| `h` | Hamzatul Wasl | Penanda Washal Hamzah. |
-| `s` | Saktah | Huruf yang tidak dibaca atau berhenti sejenak. |
-| `l` | Lam Shamsiyyah | Aturan Al-Syamsiyah. |
-| `n` | Mad Asli / Thabi'i | Pemanjangan normal: 2 Harakat. |
-| `p` | Mad Jaiz Munfasil | Pemanjangan boleh: 2, 4, 6 Harakat. |
-| `m` | Mad Lazim | Pemanjangan wajib: 6 Harakat. |
-| `q` | Qalqalah | Bunyi pantulan pada huruf tertentu. |
-| `o` | Mad Wajib Muttasil | Pemanjangan wajib: 4-5 Harakat. |
-| `c` | Ikhfa Shafawi | Menyamarkan Mim Sakinah bertemu Ba. |
-| `f` | Ikhfa | Menyamarkan Nun Sakinah atau Tanwin. |
-| `w` | Idgham Shafawi | Meleburkan Mim Sakinah bertemu Mim. |
-| `i` | Iqlab | Mengubah Nun Sakinah atau Tanwin menjadi Mim. |
-| `a` | Idgham Bighunnah | Peleburan disertai suara dengung. |
-| `u` | Idgham Bila Ghunnah | Peleburan tanpa suara dengung. |
-| `d` | Idgham Mutajanisayn | Peleburan dua huruf yang sejenis. |
-| `b` | Idgham Mutaqaribayn | Peleburan dua huruf makhraj berdekatan. |
-| `g` | Ghunnah | Suara dengung selama 2 harakat. |
-
-## Daftar Qari (Audio)
-
-Tersedia audio murattal dari qari berikut:
-- 01: Abdullah Al-Juhany
-- 02: Abdul Muhsin Al-Qasim
-- 03: Abdurrahman As-Sudais
-- 04: Ibrahim Al-Dossari
-- 05: Misyari Rasyid Al-Afasi (Default)
-- 06: Yasser Al-Dosari
+| `[tampilkan_quran]` | Daftar Al-Quran Lengkap (Dashboard) | `color` (Warna Tema) |
+| `[equran_surat]` | Menampilkan Satu Surat Penuh | `nomor`, `color`, `audio` |
+| `[equran_ayat]` | Menampilkan Satu Ayat Spesifik | `surat`, `ayat`, `color` |
 
 ## Instalasi
 
-### 1. Download atau Clone
-```bash
-git clone https://github.com/bungrahman/equran.git
-```
-
-### 2. Integrasi ke Tema WordPress
-Tambahkan kode dari `shortcode-function.php` ke file `functions.php` tema Anda, atau gunakan `require_once`:
-```php
-require_once get_template_directory() . '/shortcode-function.php';
-```
-
-## Penggunaan Shortcode
-
-### 1. Daftar Al-Quran Lengkap
-Menampilkan antarmuka utama dengan daftar surat, pencarian, dan pilihan qari.
-```text
-[tampilkan_quran color="#hexcolor"]
-```
-
-<img width="911" height="766" alt="Desktop View" src="https://github.com/user-attachments/assets/564c182a-1791-418a-bdb2-b7d2a643583e" />
-<img width="384" height="837" alt="Mobile View" src="https://github.com/user-attachments/assets/f4f236cf-f431-4db6-952e-1d54e39e4c95" />
-
-### 2. Menampilkan Satu Surat Penuh
-```text
-[equran_surat nomor="X" color="#hexcolor" audio="KODE_QARI"]
-```
-- **nomor**: Nomor surat (1-114).
-- **audio**: Kode qari (01-06).
-
-### 3. Menampilkan Satu Ayat Spesifik
-```text
-[equran_ayat surat="X" ayat="Y" color="#hexcolor" audio="KODE_QARI"]
-```
+1. Salin file `shortcode-function.php` ke direktori tema WordPress Anda.
+2. Tambahkan baris `require_once get_template_directory() . '/shortcode-function.php';` pada file `functions.php`.
+3. Pastikan WordPress Anda memiliki akses internet untuk mengambil data dari endpoint API eksternal.
 
 ## Kontribusi
 
-Bagi yang ingin berkontribusi dalam pengembangan UI, optimasi parsing tajwid, atau fitur tambahan, silakan ajukan pull request.
+Pengembangan UI, optimasi algoritma parsing tajwid, serta penambahan fitur interaktif lainnya sangat disambut baik melalui mekanisme Pull Request pada repositori resmi.
 
 ## Lisensi
 
-Proyek ini bersifat open-source di bawah Lisensi MIT.
+Proyek ini didistribusikan di bawah Lisensi MIT.
