@@ -7,6 +7,7 @@
 
 
 
+
 function equran_wordpress_style($atts) {
     // Atribut shortcode
     $atts = shortcode_atts(
@@ -32,7 +33,13 @@ function equran_wordpress_style($atts) {
     ob_start();
     ?>
     <style>
+		/* Cari bagian <style> di kode kamu dan tempel ini di atasnya */
+		@font-face {
+			font-family: 'LPMQ';
+			src: url('https://web-al-quran.s3.ap-southeast-1.amazonaws.com/font/LPMQ.ttf');
+		}
         :root { --p-blue: <?php echo $primary_color; ?>; --bg-light: #f6f7f7; }
+		
         .q-app { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; max-width: 900px; margin: auto; color: #1d2327; }
         
         /* Search Box */
@@ -53,7 +60,13 @@ function equran_wordpress_style($atts) {
         }
         .s-main { flex-grow: 1; }
         .s-ar-box { text-align: right; }
-        .s-name-ar { font-size: 1.4rem; font-weight: bold; color: var(--p-blue); }
+        .s-name-ar { 
+			font-size: 1.8rem; 
+			font-weight: normal; 
+			color: var(--p-blue); 
+			font-family: 'LPMQ', serif; /* Tambahkan ini */
+			direction: rtl; /* Tambahkan ini */
+		}
 
         /* Detail View */
         #q-view { display: none; }
@@ -70,7 +83,15 @@ function equran_wordpress_style($atts) {
         .icon-btn.active { color: #d63638; } /* Warna merah pas stop */
         .dashicons { font-size: 20px; width: 20px; height: 20px; }
 
-        .ar-txt { text-align: right; font-size: 2.3rem; line-height: 2.8; margin-bottom: 15px; font-family: "Amiri", serif; color: #2c3338; }
+        .ar-txt { 
+			text-align: right; 
+			font-size: 2.8rem; /* Ukuran agak digedein karena font Mushaf biasanya lebih rapat */
+			line-height: 2.5; 
+			margin-bottom: 15px; 
+			font-family: "LPMQ", serif; /* Ganti dari Amiri ke LPMQ */
+			color: #2c3338; 
+			direction: rtl; /* Pastikan arah teks dari kanan */
+		}
         .lt-txt { color: var(--p-blue); font-style: italic; margin-bottom: 8px;}
         .id-txt { line-height: 1.6; color: #3c434a; }
         .a-item { border-bottom: 1px solid #dcdcde; padding: 30px 0; }
@@ -107,13 +128,16 @@ function equran_wordpress_style($atts) {
         <div id="m-tafsir" class="wp-modal">
             <div class="wp-modal-content">
                 <span class="dashicons dashicons-no-alt" style="position:absolute; right:15px; top:15px; cursor:pointer;" onclick="closeM()"></span>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-right: 30px;">
-                    <h3 id="m-title" style="color:var(--p-blue); margin:0;">Tafsir Ayat</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-right: 35px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="dashicons dashicons-book-alt" style="color:var(--p-blue); font-size: 24px; width: 24px; height: 24px;"></span>
+                        <h3 id="m-title" style="color:var(--p-blue); margin:0;">Tafsir Ayat</h3>
+                    </div>
                     <div style="display: flex; gap: 8px;">
                         <button class="btn-tts" id="btn-tts-m" onclick="speakM()">
                             <span class="dashicons dashicons-megaphone"></span> Baca
                         </button>
-                        <button class="btn-copy" onclick="copyM()">
+                        <button class="btn-copy" onclick="copyM(this)">
                             <span class="dashicons dashicons-admin-page"></span> Salin
                         </button>
                     </div>
@@ -206,7 +230,7 @@ function equran_wordpress_style($atts) {
                             <h2 style="margin:0; color:var(--p-blue);">${s.namaLatin} &bull; <small style="color:#646970">${s.arti}</small></h2>
                             <div style="font-size:13px; color:#646970; margin-top:5px;">${s.tempatTurun} &bull; ${s.jumlahAyat} Ayat</div>
                         </div>
-                        <div style="font-size:1.8rem; font-weight:bold; color:var(--p-blue);">${s.nama}</div>
+                        <div style="font-size:2.5rem; font-weight:normal; color:var(--p-blue); font-family: 'LPMQ', serif; direction: rtl;">${s.nama}</div>
                     </div>
                     
                     <div class="q-toolbar">
@@ -373,7 +397,10 @@ function equran_wordpress_style($atts) {
             document.getElementById('m-tafsir').style.display = 'block';
         }
 
-        function closeM() { document.getElementById('m-tafsir').style.display = 'none'; }
+        function closeM() { 
+            document.getElementById('m-tafsir').style.display = 'none'; 
+            if (speech.speaking) speech.cancel();
+        }
         function backTo() { 
             if(player) player.pause();
             document.getElementById('q-list').style.display = 'block';
@@ -392,31 +419,63 @@ function equran_wordpress_style($atts) {
         let speakBtn = null;
 
         function speakText(text, btn) {
+            if (!speech) { alert('Browser lu gak support TTS cok!'); return; }
+            
             if (speech.speaking) {
                 speech.cancel();
+                const wasActive = (speakBtn === btn);
                 if (speakBtn) {
                     speakBtn.classList.remove('speaking');
                     if (speakBtn.id === 'btn-tts-all') speakBtn.innerHTML = '<span class="dashicons dashicons-megaphone"></span> Baca Arti';
                 }
-                if (speakBtn === btn) { speakBtn = null; return; }
+                speakBtn = null;
+                if (wasActive) return;
+                // Kasih jeda dikit biar cancel-nya kelar di beberapa browser
+                setTimeout(() => startSpeech(text, btn), 100);
+                return;
             }
 
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'id-ID';
-            utter.rate = 1.1;
-            
-            utter.onstart = () => {
-                btn.classList.add('speaking');
-                speakBtn = btn;
-            };
-            
-            utter.onend = () => {
-                btn.classList.remove('speaking');
-                if (btn.id === 'btn-tts-all') btn.innerHTML = '<span class="dashicons dashicons-megaphone"></span> Baca Arti';
-                speakBtn = null;
-            };
+            startSpeech(text, btn);
+        }
 
-            speech.speak(utter);
+        function startSpeech(text, btn) {
+            const chunks = text.match(/[^.!?]+[.!?]*/g) || [text];
+            let current = 0;
+
+            btn.classList.add('speaking');
+            speakBtn = btn;
+
+            function speakNext() {
+                if (current >= chunks.length || !btn.classList.contains('speaking')) {
+                    btn.classList.remove('speaking');
+                    if (btn.id === 'btn-tts-all') btn.innerHTML = '<span class="dashicons dashicons-megaphone"></span> Baca Arti';
+                    speakBtn = null;
+                    return;
+                }
+
+                const utter = new SpeechSynthesisUtterance(chunks[current].trim());
+                const voices = speech.getVoices();
+                const idVoice = voices.find(v => v.lang.includes('id'));
+                if (idVoice) utter.voice = idVoice;
+                
+                utter.lang = 'id-ID';
+                utter.rate = 1.0;
+                
+                utter.onend = () => {
+                    current++;
+                    speakNext();
+                };
+
+                utter.onerror = (e) => {
+                    console.error("TTS Error", e);
+                    btn.classList.remove('speaking');
+                    speakBtn = null;
+                };
+
+                speech.speak(utter);
+            }
+
+            speakNext();
         }
 
         function speakM() {
@@ -424,13 +483,17 @@ function equran_wordpress_style($atts) {
             speakText(txt, document.getElementById('btn-tts-m'));
         }
 
-        function copyM() {
+        function copyM(btn) {
             const txt = document.getElementById('m-body').innerText;
-            navigator.clipboard.writeText(txt);
-            const btn = event.currentTarget;
-            const old = btn.innerHTML;
-            btn.innerHTML = '<span class="dashicons dashicons-yes"></span> Tersalin';
-            setTimeout(() => btn.innerHTML = old, 1500);
+            navigator.clipboard.writeText(txt).then(() => {
+                const old = btn.innerHTML;
+                btn.innerHTML = '<span class="dashicons dashicons-yes"></span> Tersalin';
+                btn.style.borderColor = '#2ecc71';
+                setTimeout(() => {
+                    btn.innerHTML = old;
+                    btn.style.borderColor = '#dcdcde';
+                }, 1500);
+            });
         }
 
         function copyA(txt, btn) {
@@ -444,6 +507,9 @@ function equran_wordpress_style($atts) {
             const btn = document.getElementById('btn-tts-all');
             if (speech.speaking && btn.classList.contains('speaking')) {
                 speech.cancel();
+                btn.classList.remove('speaking');
+                btn.innerHTML = '<span class="dashicons dashicons-megaphone"></span> Baca Arti';
+                speakBtn = null;
                 return;
             }
 
@@ -508,7 +574,7 @@ function equran_surat_shortcode($atts) {
                         </audio>
                     <?php endif; ?>
                 </div>
-                <div style="text-align:right; font-size:2rem; line-height:2.5; margin-bottom:15px; font-family: 'Amiri', serif;"><?php echo $a['teksArab']; ?></div>
+                <div style="text-align:right; font-size:2.5rem; line-height:2.5; margin-bottom:15px; font-family: 'LPMQ', serif; direction: rtl;"><?php echo $a['teksArab']; ?></div>
                 <div style="color:var(--p-blue); font-style:italic; font-size:0.9rem; margin-bottom:5px;"><?php echo $a['teksLatin']; ?></div>
                 <div style="line-height:1.6; color:#3c434a;"><?php echo $a['teksIndonesia']; ?></div>
             </div>
@@ -567,7 +633,7 @@ function equran_ayat_shortcode($atts) {
                 </audio>
             <?php endif; ?>
         </div>
-        <div style="text-align:right; font-size:2.2rem; line-height:2.6; margin-bottom:20px; font-family: 'Amiri', serif;"><?php echo $ayat_found['teksArab']; ?></div>
+        <div style="text-align:right; font-size:2.5rem; line-height:2.5; margin-bottom:15px; font-family: 'LPMQ', serif; direction: rtl;"><?php echo $ayat_found['teksArab']; ?></div>
         <div style="color:var(--p-blue); font-style:italic; font-size:0.95rem; margin-bottom:10px;"><?php echo $ayat_found['teksLatin']; ?></div>
         <div style="line-height:1.6; color:#3c434a; font-size:1.1rem;"><?php echo $ayat_found['teksIndonesia']; ?></div>
     </div>
@@ -575,3 +641,5 @@ function equran_ayat_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('equran_ayat', 'equran_ayat_shortcode');
+
+
