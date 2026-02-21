@@ -4,7 +4,7 @@
  * Description: Menampilkan Al-Quran lengkap dengan audio dan tafsir melalui shortcode [tampilkan_quran].
  * Author: Bung Rahman
  */
-  
+   
 
 function equran_wordpress_style($atts) {
     // Atribut shortcode
@@ -59,7 +59,7 @@ function equran_wordpress_style($atts) {
 			font-size: 1.8rem; 
 			font-weight: normal; 
 			color: var(--p-blue); 
-			font-family: 'Amiri', 'Scheherazade New', serif;
+			font-family: 'LPMQ', 'Amiri', 'Scheherazade New', serif;
 			direction: rtl;
 		}
 
@@ -83,7 +83,7 @@ function equran_wordpress_style($atts) {
 			font-size: 2.8rem; 
 			line-height: 2.5; 
 			margin-bottom: 15px; 
-			font-family: 'Amiri', 'Scheherazade New', serif;
+			font-family: 'LPMQ', 'Amiri', 'Scheherazade New', serif;
 			color: #2c3338; 
 			direction: rtl;
 		}
@@ -143,6 +143,24 @@ function equran_wordpress_style($atts) {
         .tj-l-item { display: flex; align-items: center; gap: 4px; background: #f9f9f9; padding: 2px 8px; border-radius: 12px; border: 1px solid #eee; color: #666; }
         .tj-l-dot { width: 8px; height: 8px; border-radius: 50%; }
         .q-app.no-tajweed .tj-legend { display: none !important; }
+
+        /* Arabic Numeral Ornament */
+        .ar-num { 
+            font-family: 'Amiri', serif; 
+            font-size: 1.4rem; 
+            margin: 0 5px; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 32px; 
+            height: 32px; 
+            border: 2px solid var(--p-blue); 
+            border-radius: 50%; 
+            color: var(--p-blue); 
+            vertical-align: middle;
+            text-shadow: none;
+            position: relative;
+        }
     </style>
 
     <div class="q-app">
@@ -216,6 +234,11 @@ function equran_wordpress_style($atts) {
         let player = null;
         let activeBtn = null;
 
+        function toArabicNumber(n) {
+            const num = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+            return n.toString().split('').map(char => num[parseInt(char)] || char).join('');
+        }
+
         async function getSurah(no, card) {
             document.getElementById('q-list').style.display = 'none';
             document.getElementById('q-view').style.display = 'block';
@@ -251,7 +274,7 @@ function equran_wordpress_style($atts) {
                             <h2 style="margin:0; color:var(--p-blue);">${s.namaLatin} &bull; <small style="color:#646970">${s.arti}</small></h2>
                             <div style="font-size:13px; color:#646970; margin-top:5px;">${s.tempatTurun} &bull; ${s.jumlahAyat} Ayat</div>
                         </div>
-                        <div style="font-size:2.5rem; font-weight:normal; color:var(--p-blue); font-family: 'Amiri', serif; direction: rtl;">${s.nama}</div>
+                        <div style="font-size:2.5rem; font-weight:normal; color:var(--p-blue); font-family: 'LPMQ', 'Amiri', serif; direction: rtl;">${s.nama}</div>
                     </div>
                     
                     <div class="q-toolbar">
@@ -317,6 +340,7 @@ function equran_wordpress_style($atts) {
                     const audio = a.audio[qKey];
                     const tajweedText = parseTajweed(tajweedAyahs[idx].text);
                     const tajweedLegend = getLegendHtml(tajweedAyahs[idx].text);
+                    const arNum = `<span class="ar-num">${toArabicNumber(a.nomorAyat)}</span>`;
                     html += `
                         <div class="a-item" id="ayah-${a.nomorAyat}">
                             <div class="a-toolbar">
@@ -334,7 +358,7 @@ function equran_wordpress_style($atts) {
                                     <span class="dashicons dashicons-admin-page"></span>
                                 </button>
                             </div>
-                            <div class="ar-txt">${tajweedText}</div>
+                            <div class="ar-txt">${tajweedText}${arNum}</div>
                             ${tajweedLegend ? `<div class="tj-legend">${tajweedLegend}</div>` : ''}
                             <div class="lt-txt">${a.teksLatin}</div>
                             <div class="id-txt">${a.teksIndonesia}</div>
@@ -702,6 +726,7 @@ function equran_surat_shortcode($atts) {
                     $t = preg_replace('/\[([a-z])(?::\d+)?\]([^\[\s]+)/u', '<span class="tj-$1">$2</span>', $t);
                     echo $t;
                     ?>
+                    <span class="ar-num"><?php echo equran_to_arabic_number($a['nomorAyat']); ?></span>
                 </div>
                 <?php if (!empty($tajweed_raw)) echo equran_get_tajweed_legend_php($tajweed_raw); ?>
                 <div style="color:var(--p-blue); font-style:italic; font-size:0.9rem; margin-bottom:5px;"><?php echo $a['teksLatin']; ?></div>
@@ -802,6 +827,7 @@ function equran_ayat_shortcode($atts) {
             $t = preg_replace('/\[([a-z])(?::\d+)?\]([^\[\s]+)/u', '<span class="tj-$1">$2</span>', $t);
             echo $t;
             ?>
+            <span class="ar-num"><?php echo equran_to_arabic_number($no_a); ?></span>
         </div>
         <?php if ($tajweed_text !== $ayat_found['teksArab']) echo equran_get_tajweed_legend_php($tajweed_text); ?>
         <div style="color:var(--p-blue); font-style:italic; font-size:0.95rem; margin-bottom:10px;"><?php echo $ayat_found['teksLatin']; ?></div>
@@ -854,5 +880,11 @@ function equran_get_tajweed_legend_php($text) {
     }
     $html .= '</div>';
     return count($uniqueRules) > 0 ? $html : '';
+}
+
+function equran_to_arabic_number($n) {
+    $western = array('0','1','2','3','4','5','6','7','8','9');
+    $arabic = array('٠','١','٢','٣','٤','٥','٦','٧','٨','٩');
+    return str_replace($western, $arabic, $n);
 }
 
