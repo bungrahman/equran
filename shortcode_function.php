@@ -4,9 +4,7 @@
  * Description: Menampilkan Al-Quran lengkap dengan audio dan tafsir melalui shortcode [tampilkan_quran].
  * Author: Bung Rahman
  */
-
-
-
+  
 
 function equran_wordpress_style($atts) {
     // Atribut shortcode
@@ -32,14 +30,11 @@ function equran_wordpress_style($atts) {
 
     ob_start();
     ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
-		/* Cari bagian <style> di kode kamu dan tempel ini di atasnya */
-		@font-face {
-			font-family: 'LPMQ';
-			src: url('https://web-al-quran.s3.ap-southeast-1.amazonaws.com/font/LPMQ.ttf');
-		}
         :root { --p-blue: <?php echo $primary_color; ?>; --bg-light: #f6f7f7; }
-		
         .q-app { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; max-width: 900px; margin: auto; color: #1d2327; }
         
         /* Search Box */
@@ -64,8 +59,8 @@ function equran_wordpress_style($atts) {
 			font-size: 1.8rem; 
 			font-weight: normal; 
 			color: var(--p-blue); 
-			font-family: 'LPMQ', serif; /* Tambahkan ini */
-			direction: rtl; /* Tambahkan ini */
+			font-family: 'Amiri', 'Scheherazade New', serif;
+			direction: rtl;
 		}
 
         /* Detail View */
@@ -85,12 +80,12 @@ function equran_wordpress_style($atts) {
 
         .ar-txt { 
 			text-align: right; 
-			font-size: 2.8rem; /* Ukuran agak digedein karena font Mushaf biasanya lebih rapat */
+			font-size: 2.8rem; 
 			line-height: 2.5; 
 			margin-bottom: 15px; 
-			font-family: "LPMQ", serif; /* Ganti dari Amiri ke LPMQ */
+			font-family: 'Amiri', 'Scheherazade New', serif;
 			color: #2c3338; 
-			direction: rtl; /* Pastikan arah teks dari kanan */
+			direction: rtl;
 		}
         .lt-txt { color: var(--p-blue); font-style: italic; margin-bottom: 8px;}
         .id-txt { line-height: 1.6; color: #3c434a; }
@@ -122,6 +117,32 @@ function equran_wordpress_style($atts) {
         .btn-copy:hover { border-color: #2ecc71; color: #2ecc71; }
         .btn-tts.speaking { background: var(--p-blue); border-color: var(--p-blue); color: #fff; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        /* Tajweed Colors (17 Rules) */
+        .tj-h { color: #AAAAAA; } /* Hamzatul Wasl */
+        .tj-s { color: #AAAAAA; } /* Saktah / Tidak Dibaca */
+        .tj-l { color: #AAAAAA; } /* Lam Shamsiyyah */
+        .tj-n { color: #537FFF; } /* Mad Asli / Mad Thabi'i */
+        .tj-p { color: #4050FF; } /* Mad Jaiz Munfasil */
+        .tj-m { color: #000EBC; } /* Mad Lazim */
+        .tj-q { color: #DD0008; } /* Qalqalah */
+        .tj-o { color: #2144C1; } /* Mad Wajib Muttasil */
+        .tj-c { color: #D500B7; } /* Ikhfa Shafawi */
+        .tj-f { color: #9400A8; } /* Ikhfa */
+        .tj-w { color: #58B800; } /* Idgham Shafawi */
+        .tj-i { color: #26BFFD; } /* Iqlab */
+        .tj-a { color: #169777; } /* Idgham Bighunnah */
+        .tj-u { color: #169200; } /* Idgham Bila Ghunnah */
+        .tj-d { color: #A1A1A1; } /* Idgham Mutajanisayn */
+        .tj-b { color: #A1A1A1; } /* Idgham Mutaqaribayn */
+        .tj-g { color: #FF7E1E; } /* Ghunnah */
+        
+        .q-app.no-tajweed span[class^="tj-"] { color: inherit !important; }
+
+        /* Legend Style */
+        .tj-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: 11px; }
+        .tj-l-item { display: flex; align-items: center; gap: 4px; background: #f9f9f9; padding: 2px 8px; border-radius: 12px; border: 1px solid #eee; color: #666; }
+        .tj-l-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .q-app.no-tajweed .tj-legend { display: none !important; }
     </style>
 
     <div class="q-app">
@@ -230,7 +251,7 @@ function equran_wordpress_style($atts) {
                             <h2 style="margin:0; color:var(--p-blue);">${s.namaLatin} &bull; <small style="color:#646970">${s.arti}</small></h2>
                             <div style="font-size:13px; color:#646970; margin-top:5px;">${s.tempatTurun} &bull; ${s.jumlahAyat} Ayat</div>
                         </div>
-                        <div style="font-size:2.5rem; font-weight:normal; color:var(--p-blue); font-family: 'LPMQ', serif; direction: rtl;">${s.nama}</div>
+                        <div style="font-size:2.5rem; font-weight:normal; color:var(--p-blue); font-family: 'Amiri', serif; direction: rtl;">${s.nama}</div>
                     </div>
                     
                     <div class="q-toolbar">
@@ -272,6 +293,13 @@ function equran_wordpress_style($atts) {
                         <button class="btn-audio-full" id="btn-f-${no}" onclick="playFullSurah('${audioFullUrl}', this)">
                             <span class="dashicons dashicons-controls-play"></span> Play Audio Full
                         </button>` : ''}
+                        <div class="q-tool-item">
+                            <span class="dashicons dashicons-art"></span> <span>Tajwid</span>
+                            <label class="switch">
+                                <input type="checkbox" checked onchange="toggleTajweed(this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                         <button class="btn-tts" id="btn-tts-all" onclick="speakSurahTranslation()">
                             <span class="dashicons dashicons-megaphone"></span> Baca Arti
                         </button>
@@ -281,9 +309,14 @@ function equran_wordpress_style($atts) {
                 const selDetail = document.querySelector('.sel-qari-detail');
                 if(selDetail) selDetail.value = qKey;
 
+                const tajweedData = await fetch(`https://api.alquran.cloud/v1/surah/${no}/quran-tajweed`).then(r => r.json());
+                const tajweedAyahs = tajweedData.data.ayahs;
+
                 let html = '';
-                s.ayat.forEach(a => {
+                s.ayat.forEach((a, idx) => {
                     const audio = a.audio[qKey];
+                    const tajweedText = parseTajweed(tajweedAyahs[idx].text);
+                    const tajweedLegend = getLegendHtml(tajweedAyahs[idx].text);
                     html += `
                         <div class="a-item" id="ayah-${a.nomorAyat}">
                             <div class="a-toolbar">
@@ -301,7 +334,8 @@ function equran_wordpress_style($atts) {
                                     <span class="dashicons dashicons-admin-page"></span>
                                 </button>
                             </div>
-                            <div class="ar-txt">${a.teksArab}</div>
+                            <div class="ar-txt">${tajweedText}</div>
+                            ${tajweedLegend ? `<div class="tj-legend">${tajweedLegend}</div>` : ''}
                             <div class="lt-txt">${a.teksLatin}</div>
                             <div class="id-txt">${a.teksIndonesia}</div>
                         </div>
@@ -340,6 +374,57 @@ function equran_wordpress_style($atts) {
 
         function toggleContent(cls, show) {
             document.querySelectorAll(`.${cls}`).forEach(el => el.style.display = show ? 'block' : 'none');
+        }
+
+        function toggleTajweed(show) {
+            const app = document.querySelector('.q-app');
+            if (show) app.classList.remove('no-tajweed');
+            else app.classList.add('no-tajweed');
+        }
+
+        function parseTajweed(text) {
+            if (!text) return '';
+            // Two-pass regex for both bracketed and non-bracketed styles
+            let t = text;
+            t = t.replace(/\[([a-z])(?::\d+)?(?:\]\[|\[)([^\]]+)\]/gu, '<span class="tj-$1">$2</span>');
+            t = t.replace(/\[([a-z])(?::\d+)?\]([^\[\s]+)/gu, '<span class="tj-$1">$2</span>');
+            return t;
+        }
+
+        function getLegendHtml(text) {
+            if (!text) return '';
+            const rules = {
+                'h': { n: 'Hamzatul Wasl', c: '#AAAAAA', d: 'Washal Hamzah' },
+                's': { n: 'Saktah / Tidak Dibaca', c: '#AAAAAA', d: 'Huruf yang tidak dibaca' },
+                'l': { n: 'Lam Shamsiyyah', c: '#AAAAAA', d: 'Al-Syamsiyah' },
+                'n': { n: 'Mad Asli / Mad Thabi\'i', c: '#537FFF', d: 'Pemanjangan normal: 2 Harakat' },
+                'p': { n: 'Mad Jaiz Munfasil', c: '#4050FF', d: 'Pemanjangan boleh: 2, 4, 6 Harakat' },
+                'm': { n: 'Mad Lazim', c: '#000EBC', d: 'Pemanjangan wajib: 6 Harakat' },
+                'q': { n: 'Qalqalah', c: '#DD0008', d: 'Bunyi memantul' },
+                'o': { n: 'Mad Wajib Muttasil', c: '#2144C1', d: 'Pemanjangan wajib: 4-5 Harakat' },
+                'c': { n: 'Ikhfa Shafawi', c: '#D500B7', d: 'Menyamarkan Mim Sakinah ketika bertemu Ba' },
+                'f': { n: 'Ikhfa', c: '#9400A8', d: 'Menyamarkan Nun Sakinah atau Tanwin' },
+                'w': { n: 'Idgham Shafawi', c: '#58B800', d: 'Meleburkan Mim Sakinah ketika bertemu Mim' },
+                'i': { n: 'Iqlab', c: '#26BFFD', d: 'Mengubah Nun Sakinah atau Tanwin menjadi Mim' },
+                'a': { n: 'Idgham Bighunnah', c: '#169777', d: 'Meleburkan dengan dengung' },
+                'u': { n: 'Idgham Bila Ghunnah', c: '#169200', d: 'Meleburkan tanpa dengung' },
+                'd': { n: 'Idgham Mutajanisayn', c: '#A1A1A1', d: 'Peleburan dua huruf sejenis' },
+                'b': { n: 'Idgham Mutaqaribayn', c: '#A1A1A1', d: 'Peleburan dua huruf yang makhrajnya berdekatan' },
+                'g': { n: 'Ghunnah', c: '#FF7E1E', d: 'Dengung: 2 Harakat' }
+            };
+            const found = [...new Set(text.match(/\[([a-z])(?::\d+)?/g) || [])]
+                .map(m => m.match(/\[([a-z])/)[1]);
+            
+            const uniqueRules = [];
+            const seenNames = new Set();
+            found.forEach(r => {
+                if (rules[r] && !seenNames.has(rules[r].n)) {
+                    uniqueRules.push(rules[r]);
+                    seenNames.add(rules[r].n);
+                }
+            });
+            
+            return uniqueRules.map(r => `<div class="tj-l-item" title="${r.d}"><div class="tj-l-dot" style="background:${r.c}"></div> ${r.n}</div>`).join('');
         }
 
         function playFullSurah(url, btn) {
@@ -550,8 +635,41 @@ function equran_surat_shortcode($atts) {
     if (!isset($data['data'])) return "Surat tidak ditemukan.";
     $s = $data['data'];
 
+    // Fetch Tajweed data
+    $tajweed_url = "https://api.alquran.cloud/v1/surah/{$no}/quran-tajweed";
+    $tajweed_response = wp_remote_get($tajweed_url);
+    $tajweed_ayahs = array();
+    if (!is_wp_error($tajweed_response)) {
+        $tajweed_data = json_decode(wp_remote_retrieve_body($tajweed_response), true);
+        if (isset($tajweed_data['data']['ayahs'])) {
+            $tajweed_ayahs = $tajweed_data['data']['ayahs'];
+        }
+    }
+
     ob_start();
     ?>
+    <style>
+        .tj-q { color: #DD0008; } /* Qalqalah */
+        .tj-o { color: #2144C1; } /* Mad Wajib Muttasil */
+        .tj-p { color: #4050FF; } /* Mad Jaiz Munfasil */
+        .tj-a { color: #169777; } /* Idgham Bighunnah */
+        .tj-u { color: #169200; } /* Idgham Bila Ghunnah */
+        .tj-m { color: #000EBC; } /* Mad Lazim */
+        .tj-n { color: #537FFF; } /* Mad Asli / Mad Thabi'i */
+        .tj-g { color: #FF7E1E; } /* Ghunnah */
+        .tj-f { color: #9400A8; } /* Ikhfa */
+        .tj-i { color: #26BFFD; } /* Iqlab */
+        .tj-w { color: #58B800; } /* Idgham Shafawi */
+        .tj-c { color: #D500B7; } /* Ikhfa Shafawi */
+        .tj-d { color: #A1A1A1; } /* Idgham Mutajanisayn */
+        .tj-b { color: #A1A1A1; } /* Idgham Mutaqaribayn */
+        .tj-l { color: #AAAAAA; } /* Lam Shamsiyyah */
+        .tj-s { color: #AAAAAA; } /* Saktah / Tidak Dibaca */
+        .tj-h { color: #AAAAAA; } /* Hamzatul Wasl */
+        .tj-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: 11px; }
+        .tj-l-item { display: flex; align-items: center; gap: 4px; background: #f9f9f9; padding: 2px 8px; border-radius: 12px; border: 1px solid #eee; color: #666; cursor: help; }
+        .tj-l-dot { width: 8px; height: 8px; border-radius: 50%; }
+    </style>
     <div class="equran-surat-wrap" style="--p-blue: <?php echo $color; ?>; font-family: sans-serif; max-width: 900px; margin: 20px auto; border: 1px solid #dcdcde; padding: 20px; border-radius: 8px; background: #fff;">
         <div style="text-align:center; padding-bottom:20px; border-bottom: 2px solid var(--p-blue); margin-bottom:20px;">
             <h2 style="color:var(--p-blue); margin:0;"><?php echo $s['namaLatin']; ?> (<?php echo $s['nama']; ?>)</h2>
@@ -574,7 +692,18 @@ function equran_surat_shortcode($atts) {
                         </audio>
                     <?php endif; ?>
                 </div>
-                <div style="text-align:right; font-size:2.5rem; line-height:2.5; margin-bottom:15px; font-family: 'LPMQ', serif; direction: rtl;"><?php echo $a['teksArab']; ?></div>
+                <div style="text-align:right; font-size:2.8rem; line-height:2.5; margin-bottom:15px; font-family: 'Amiri', 'Scheherazade New', serif; direction: rtl;">
+                    <?php 
+                    $tajweed_raw = isset($tajweed_ayahs[$a['nomorAyat']-1]['text']) ? $tajweed_ayahs[$a['nomorAyat']-1]['text'] : '';
+                    $tajweed_text = !empty($tajweed_raw) ? $tajweed_raw : $a['teksArab'];
+                    // Two-pass regex for both bracketed and non-bracketed styles
+                    $t = $tajweed_text;
+                    $t = preg_replace('/\[([a-z])(?::\d+)?(?:\]\[|\[)([^\]]+)\]/u', '<span class="tj-$1">$2</span>', $t);
+                    $t = preg_replace('/\[([a-z])(?::\d+)?\]([^\[\s]+)/u', '<span class="tj-$1">$2</span>', $t);
+                    echo $t;
+                    ?>
+                </div>
+                <?php if (!empty($tajweed_raw)) echo equran_get_tajweed_legend_php($tajweed_raw); ?>
                 <div style="color:var(--p-blue); font-style:italic; font-size:0.9rem; margin-bottom:5px;"><?php echo $a['teksLatin']; ?></div>
                 <div style="line-height:1.6; color:#3c434a;"><?php echo $a['teksIndonesia']; ?></div>
             </div>
@@ -620,8 +749,41 @@ function equran_ayat_shortcode($atts) {
     
     if (!$ayat_found) return "Ayat tidak ditemukan.";
 
+    // Fetch Tajweed for the specific ayah
+    $tajweed_url = "https://api.alquran.cloud/v1/ayah/{$no_s}:{$no_a}/quran-tajweed";
+    $tajweed_response = wp_remote_get($tajweed_url);
+    $tajweed_text = $ayat_found['teksArab'];
+    if (!is_wp_error($tajweed_response)) {
+        $tajweed_data = json_decode(wp_remote_retrieve_body($tajweed_response), true);
+        if (isset($tajweed_data['data']['text'])) {
+            $tajweed_text = $tajweed_data['data']['text'];
+        }
+    }
+
     ob_start();
     ?>
+    <style>
+        .tj-q { color: #DD0008; } /* Qalqalah */
+        .tj-o { color: #2144C1; } /* Mad Wajib Muttasil */
+        .tj-p { color: #4050FF; } /* Mad Jaiz Munfasil */
+        .tj-a { color: #169777; } /* Idgham Bighunnah */
+        .tj-u { color: #169200; } /* Idgham Bila Ghunnah */
+        .tj-m { color: #000EBC; } /* Mad Lazim */
+        .tj-n { color: #537FFF; } /* Mad Asli / Mad Thabi'i */
+        .tj-g { color: #FF7E1E; } /* Ghunnah */
+        .tj-f { color: #9400A8; } /* Ikhfa */
+        .tj-i { color: #26BFFD; } /* Iqlab */
+        .tj-w { color: #58B800; } /* Idgham Shafawi */
+        .tj-c { color: #D500B7; } /* Ikhfa Shafawi */
+        .tj-d { color: #A1A1A1; } /* Idgham Mutajanisayn */
+        .tj-b { color: #A1A1A1; } /* Idgham Mutaqaribayn */
+        .tj-l { color: #AAAAAA; } /* Lam Shamsiyyah */
+        .tj-s { color: #AAAAAA; } /* Saktah / Tidak Dibaca */
+        .tj-h { color: #AAAAAA; } /* Hamzatul Wasl */
+        .tj-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: 11px; }
+        .tj-l-item { display: flex; align-items: center; gap: 4px; background: #f9f9f9; padding: 2px 8px; border-radius: 12px; border: 1px solid #eee; color: #666; cursor: help; }
+        .tj-l-dot { width: 8px; height: 8px; border-radius: 50%; }
+    </style>
     <div class="equran-ayat-single" style="--p-blue: <?php echo $color; ?>; font-family: sans-serif; border: 1px solid #dcdcde; border-left: 5px solid var(--p-blue); padding: 25px; border-radius: 4px; max-width: 900px; margin: 20px auto; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div style="font-size: 13px; color: var(--p-blue); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
@@ -633,7 +795,15 @@ function equran_ayat_shortcode($atts) {
                 </audio>
             <?php endif; ?>
         </div>
-        <div style="text-align:right; font-size:2.5rem; line-height:2.5; margin-bottom:15px; font-family: 'LPMQ', serif; direction: rtl;"><?php echo $ayat_found['teksArab']; ?></div>
+        <div style="text-align:right; font-size:2.5rem; line-height:2.5; margin-bottom:15px; font-family: 'Amiri', 'Scheherazade New', serif; direction: rtl;">
+            <?php 
+            $t = $tajweed_text;
+            $t = preg_replace('/\[([a-z])(?::\d+)?(?:\]\[|\[)([^\]]+)\]/u', '<span class="tj-$1">$2</span>', $t);
+            $t = preg_replace('/\[([a-z])(?::\d+)?\]([^\[\s]+)/u', '<span class="tj-$1">$2</span>', $t);
+            echo $t;
+            ?>
+        </div>
+        <?php if ($tajweed_text !== $ayat_found['teksArab']) echo equran_get_tajweed_legend_php($tajweed_text); ?>
         <div style="color:var(--p-blue); font-style:italic; font-size:0.95rem; margin-bottom:10px;"><?php echo $ayat_found['teksLatin']; ?></div>
         <div style="line-height:1.6; color:#3c434a; font-size:1.1rem;"><?php echo $ayat_found['teksIndonesia']; ?></div>
     </div>
@@ -642,4 +812,47 @@ function equran_ayat_shortcode($atts) {
 }
 add_shortcode('equran_ayat', 'equran_ayat_shortcode');
 
+function equran_get_tajweed_legend_php($text) {
+    if (empty($text)) return '';
+    $rules = array(
+        'h' => array('n' => 'Hamzatul Wasl', 'c' => '#AAAAAA', 'd' => 'Washal Hamzah'),
+        's' => array('n' => 'Saktah / Tidak Dibaca', 'c' => '#AAAAAA', 'd' => 'Huruf yang tidak dibaca'),
+        'l' => array('n' => 'Lam Shamsiyyah', 'c' => '#AAAAAA', 'd' => 'Al-Syamsiyah'),
+        'n' => array('n' => 'Mad Asli / Mad Thabi\'i', 'c' => '#537FFF', 'd' => 'Pemanjangan normal: 2 Harakat'),
+        'p' => array('n' => 'Mad Jaiz Munfasil', 'c' => '#4050FF', 'd' => 'Pemanjangan boleh: 2, 4, 6 Harakat'),
+        'm' => array('n' => 'Mad Lazim', 'c' => '#000EBC', 'd' => 'Pemanjangan wajib: 6 Harakat'),
+        'q' => array('n' => 'Qalqalah', 'c' => '#DD0008', 'd' => 'Bunyi memantul'),
+        'o' => array('n' => 'Mad Wajib Muttasil', 'c' => '#2144C1', 'd' => 'Pemanjangan wajib: 4-5 Harakat'),
+        'c' => array('n' => 'Ikhfa Shafawi', 'c' => '#D500B7', 'd' => 'Menyamarkan Mim Sakinah ketika bertemu Ba'),
+        'f' => array('n' => 'Ikhfa', 'c' => '#9400A8', 'd' => 'Menyamarkan Nun Sakinah atau Tanwin'),
+        'w' => array('n' => 'Idgham Shafawi', 'c' => '#58B800', 'd' => 'Meleburkan Mim Sakinah ketika bertemu Mim'),
+        'i' => array('n' => 'Iqlab', 'c' => '#26BFFD', 'd' => 'Mengubah Nun Sakinah atau Tanwin menjadi Mim'),
+        'a' => array('n' => 'Idgham Bighunnah', 'c' => '#169777', 'd' => 'Meleburkan dengan dengung'),
+        'u' => array('n' => 'Idgham Bila Ghunnah', 'c' => '#169200', 'd' => 'Meleburkan tanpa dengung'),
+        'd' => array('n' => 'Idgham Mutajanisayn', 'c' => '#A1A1A1', 'd' => 'Peleburan dua huruf sejenis'),
+        'b' => array('n' => 'Idgham Mutaqaribayn', 'c' => '#A1A1A1', 'd' => 'Peleburan dua huruf yang makhrajnya berdekatan'),
+        'g' => array('n' => 'Ghunnah', 'c' => '#FF7E1E', 'd' => 'Dengung: 2 Harakat'),
+    );
+    
+    preg_match_all('/\[([a-z])(?::\d+)?/', $text, $matches);
+    if (empty($matches[1])) return '';
+    $found = array_unique($matches[1]);
+    
+    // Filter out duplicate display names
+    $uniqueRules = array();
+    $seenNames = array();
+    foreach ($found as $r) {
+        if (isset($rules[$r]) && !isset($seenNames[$rules[$r]['n']])) {
+            $uniqueRules[] = $rules[$r];
+            $seenNames[$rules[$r]['n']] = true;
+        }
+    }
+    
+    $html = '<div class="tj-legend">';
+    foreach ($uniqueRules as $rule) {
+        $html .= '<div class="tj-l-item" title="'.esc_attr($rule['d']).'"><div class="tj-l-dot" style="background:'.$rule['c'].'"></div> '.$rule['n'].'</div>';
+    }
+    $html .= '</div>';
+    return count($uniqueRules) > 0 ? $html : '';
+}
 
