@@ -22,7 +22,7 @@ Interaksi dinamis dikelola sepenuhnya menggunakan Vanilla JavaScript (ES6+).
 
 ### 3. Arsitektur Styling
 - **CSS Variables**: Menggunakan variabel CSS untuk manajemen warna primer (`--p-blue`) yang memungkinkan kustomisasi tema melalui parameter shortcode.
-- **Typography Integration**: Integrasi Google Fonts (Amiri) sebagai standar tipografi Arab berkualitas tinggi dengan metode loading asinkron dan `font-display: swap` untuk optimasi User Experience.
+- **Typography Integration**: Integrasi Google Fonts (Amiri) sebagai standar tipografi Arab berkualitas tinggi dengan metode loading asinkron dan `font-display: swap` untuk optimasi User Experience jika menggunakan font LPMQ IsepMisbah.
 - **Responsive Layout**: Implementasi CSS Grid dan Flexbox untuk memastikan tampilan presisi pada perangkat desktop maupun seluler.
 
 ## Rincian API yang Digunakan
