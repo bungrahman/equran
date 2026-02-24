@@ -64,10 +64,16 @@ Setiap akhir ayat dilengkapi dengan ornamen lingkaran yang berisi nomor ayat dal
 | `[equran_ayat]` | Menampilkan Satu Ayat Spesifik | `surat`, `ayat`, `color` |
 
 ## Instalasi
-
+- Cara 1
 1. Salin file `shortcode-function.php` ke direktori tema WordPress Anda.
 2. Tambahkan baris `require_once get_template_directory() . '/shortcode-function.php';` pada file `functions.php`.
 3. Pastikan WordPress Anda memiliki akses internet untuk mengambil data dari endpoint API eksternal.
+4. Gunakan Shortcode untuk menampilkan
+   
+- Cara 2
+1. Copy Seluruh Code Function tanpa '<?php' diawal
+2. paste ke file function.php tema atau menggunakan plugin code snippet
+3. Gunakan Shortcode untuk menampilkan 
 
 ## Kontribusi
 
